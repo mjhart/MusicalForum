@@ -10,7 +10,7 @@ var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run .html files through Hogan
 app.set('views', __dirname + '/templates'); // tell Express where to find templates
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 conn.query("INSERT INTO ShowInfo VALUES(NULL, 'new show', 'me', 'jerome', 'nothing', $1, $2)", [date, date]);
@@ -281,11 +281,11 @@ app.get('/rtickets', function(request, response){
 	var num = 0;
 	var res_left = 0;
 	var taken = 0;
-	var tickets_taken = 'SELECT COUNT(p_id) as c FROM Attendees as a, Performances as p WHERE a.p_id = p.p_id and p.date_time = $1';
+	var tickets_taken = 'SELECT COUNT(*) as c FROM Attendees as a, Performances as p WHERE a.p_id = p.p_id and p.date_time = $1';
 	currshow = -1;
 	lasttime = 0;
 	d = new Date();
-	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDERBY reserve_live_date DESC'
+	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY reserve_live_date DESC'
 	var showq = conn.query(show_sql);
 	showq.on('row', function(row){
 		var liveDate = new Date(row.reserve_live_date);
@@ -302,13 +302,13 @@ app.get('/rtickets', function(request, response){
 				res_left = row.reserves;
 			});
 			q.on('end', function(){
-				var tickets_taken = 'SELECT COUNT(p_id) as c FROM Attendees as a, Performances as p WHERE a.p_id = p.p_id and p.date_time = $1';
+				var tickets_taken = 'SELECT COUNT(*) as c FROM Attendees as a, Performances as p WHERE a.p_id = p.p_id and p.date_time = $1';
 				var qtickets = conn.query(tickets_taken, [request.query.date]);
 				qtickets.on('row',function(row){
 					taken = row.c;
 				});
 				qtickets.on('end', function(){
-					var sql = 'SELECT tickets_alloted FROM Reserves WHERE show_id = '+curr_show+' and name = $1 and email = $2';
+					var sql = 'SELECT tickets_alloted FROM Reserves WHERE show_id = '+currshow+' and name = $1 and email = $2';
 					var q1 = conn.query(sql, [request.query.name, request.query.email]);
 					q1.on('row', function(row){
 						num = row.tickets_alloted;
@@ -368,7 +368,8 @@ app.post('/new_show', function(request, response){
 	var showinfo = request.body.showinfo;
 	var page_live = request.body.page_live_date;
 	var reserve_live = request.body.reserve_live_date;
-	var perfomance = request.body.performances;
+	var performance = request.body.show_array;
+	console.log(performance);
 	var curr_show = -1;
 	q = conn.query('INSERT INTO ShowInfo VALUES (NULL, $1, $2, $3, $4, $5, $6);',[title,director,mdirector,showinfo,page_live,reserve_live]);
 	q.on('end', function(){
@@ -378,7 +379,7 @@ app.post('/new_show', function(request, response){
 			curr_show = row.show_id;
 		});
 		q1.on('end', function(){
-			var ps = performances.split(';');
+			var ps = performance.split(';');
 			for(var i=0;i<ps.length;i++){
 				var p = ps[i];
 				var p_info = p.split(',');
