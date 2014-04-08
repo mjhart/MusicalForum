@@ -1,5 +1,6 @@
 window.addEventListener('load', function(){
-    getAttendeeInfo();   
+    getAttendeeInfo();
+    jQuery(".expandable-panel").click(getAttendeeInfo); 
 }, false);
 
 
@@ -7,19 +8,20 @@ function getAttendeeInfo(obj) {
     // create a request
     var request = new XMLHttpRequest();
 
+    var today = new Date();
     // specify the type of request, URL, and flag
-    var r = request.open('GET', document.URL + '/attendee/:date',true);
+    var r = request.open('GET', '/attendee/' + today.toString(),true);
 
 // This code will be executed when the page finishes loading
     request.addEventListener('load', function(e){
         
         if (request.status == 200) {
-            console.log("Request status 200");          
+            //console.log("Request status 200");          
             // do something with loaded content
             var content = request.responseText;
             var info = JSON.parse(content);
             //var attendees = info['attendees'];
-            var showGoers = Array();
+            var showGoers = new Array();
             for(var i in info){
                 if(info[i].length != 0){
                     showGoers.append(info[i]);

@@ -13,7 +13,6 @@ app.set('views', __dirname + '/templates'); // tell Express where to find templa
 app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
-conn.query("INSERT INTO ShowInfo VALUES(NULL, 'new show', 'me', 'jerome', 'nothing', $1, $2)", [date, date]);
 
 // submit ticket request
 app.post('/tickets', function(req, res) {
@@ -263,6 +262,7 @@ app.get('/show', function(request, response){
 });
 
 app.get('/attendee/:date', function(request, response){
+	console.log("attendee called");
 	var attendees = [];
 	var sql = 'SELECT name FROM Attendees WHERE p_id = $1';
 	var q = conn.query(sql, [request.params.date]);
@@ -308,14 +308,18 @@ app.get('/rtickets', function(request, response){
 					taken = row.c;
 				});
 				qtickets.on('end', function(){
+					console.log("almost there");
 					var sql = 'SELECT tickets_alloted FROM Reserves WHERE show_id = '+currshow+' and name = $1 and email = $2';
 					var q1 = conn.query(sql, [request.query.name, request.query.email]);
 					q1.on('row', function(row){
 						num = row.tickets_alloted;
 					});
 					q1.on('end', function(){
+						console.log("made it to the end");
 						num = Math.min(num,(res_left-taken));
-						response.send(num);
+						//response.send(num);
+						response.send(num.toString());
+						console.log(num);
 					});
 				});
 
