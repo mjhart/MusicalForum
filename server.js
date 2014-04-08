@@ -8,7 +8,7 @@ var conn = anyDB.createConnection('sqlite3://musicalforum.db');
 
 var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run .html files through Hogan
-app.set('views', __dirname + '/templates'); // tell Express where to find templates
+app.set('views', __dirname + '/www'); // tell Express where to find templates
 
 app.use(express.static(__dirname + '/www'));
 
@@ -152,7 +152,7 @@ var csv = require('csv');
 //when rendering editshow.html, check if the object passed in is an empty list, if it is populate as if a new show
 
 app.get('/new_show', express.basicAuth('admin', 'admin') ,function(request, response){
-	response.render('editshow.html', {info: []});
+	response.render('setup2.html');
 });
 
 //when editing, the object passed in will be two lists, one with show info and another with performance info
@@ -164,7 +164,7 @@ app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, res
 	var show_info = "";
 	var live_date = new Date();
 	var reserve_date = new Date();
-	var showinfo = [];
+	var showinfo = {};
 	var performances = [];
 	var currshow = -1; 
 	var show_sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
@@ -177,8 +177,13 @@ app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, res
 			var sql = 'SELECT * FROM ShowInfo WHERE show_id = ' + currshow +';';
 			var q = conn.query(sql);
 			q.on('row', function(row){
+				
 				console.log(row);
-				showinfo.push(row);
+				//var showinfo = {title : row.title, director : row.director, musical_director : row.mdirector, show_info : row.show_info,
+				//	page_live : row.page_live_date, res_live : row.reserve_live_date};
+				showinfo = row;
+				console.log("showinfo \n" + showinfo);
+				
 			});
 			q.on('end', function(){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
@@ -187,7 +192,10 @@ app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, res
 					performances.push(row);
 				});
 				q1.on('end', function(){
-					response.render('editshow.html', {info : [showinfo, performances]})
+					console.log("at the end");
+					console.log({info : showinfo, p : performances});
+					response.render('setup3.html', {info : showinfo, p : performances});
+					console.log("told to render");
 				});
 			});
 		}
@@ -215,7 +223,7 @@ app.get('/show', function(request, response){
 	});
 	showq.on('end', function(){
 		if(currshow != -1){
-			var showinfo = [];
+			
 			
 			var sql = 'SELECT * FROM ShowInfo WHERE show_id = ' + currshow +';';
 			var q = conn.query(sql);
@@ -226,9 +234,9 @@ app.get('/show', function(request, response){
 				var director = row.director;
 				var music_director = row.musical_director;
 				var show_info = row.show_info;
-				var information = title +' '+director+' '+music_director+' '+showinfo;
-				console.log(information);
-				showinfo.push(information);
+				var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
+				console.log(showinfo);
+				
 				
 			});
 			q.on('end', function(){
@@ -250,7 +258,7 @@ app.get('/show', function(request, response){
 
 				});
 				q1.on('end', function(){
-					response.render('show.html', {info : [showinfo, performances]})
+					response.render('show.html', {info : [showinfo, performances]});
 				});
 			});
 		}
@@ -369,30 +377,44 @@ app.post('/new_show', function(request, response){
 	var title = request.body.title;
 	var director = request.body.director;
 	var mdirector = request.body.mdirector;
-	var showinfo = request.body.showinfo;
-	var page_live = request.body.page_live_date;
-	var reserve_live = request.body.reserve_live_date;
+	var showinfo = request.body.show_info;
+	var page_live = request.body.p_live_at;
+	var reserve_live = request.body.r_live_at;
 	var performance = request.body.show_array;
+	var csv_string = request.body.csv_string;
 	console.log(performance);
 	var curr_show = -1;
+	console.log("in new show");
 	q = conn.query('INSERT INTO ShowInfo VALUES (NULL, $1, $2, $3, $4, $5, $6);',[title,director,mdirector,showinfo,page_live,reserve_live]);
 	q.on('end', function(){
-		var sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC;'
+		console.log("finished puttint in show info");
+		var sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC limit 1;'
 		q1 = conn.query(sql);
 		q1.on('row',function(row){
 			curr_show = row.show_id;
+			console.log(curr_show);
 		});
 		q1.on('end', function(){
-			var ps = performance.split(';');
-			for(var i=0;i<ps.length;i++){
-				var p = ps[i];
-				var p_info = p.split(',');
-				q2 = conn.query('INSERT INTO Performances VALUES ($1, NULL, $2, $3, $4);', [curr_show, p_info[0], p_info[1], p_info[2]]);
+			var rs = csv_string.split(',');
+			console.log("in the end");
+			console.log(rs);
+			for(var j=0;j<rs.length - 1;j=j+3){
+				q3 = conn.query('INSERT INTO Reserves VALUES ($1, $2, $3, $4);',[curr_show,rs[j],rs[j+2],rs[j+1]]).on('error', console.error);
+			}
+			var ps = performance.split(',');
+			console.log(ps);
+			for(var i=0;i<ps.length;i=i+3){
+				//var p = ps[i];
+				//console.log(p + " " + i);
+				//var p_info = p.split(',');
+				q2 = conn.query('INSERT INTO Performances VALUES ($1, NULL, $2, $3, $4);', [curr_show, ps[i], ps[i+1], ps[i+2]]).on('error', console.error);
 				q2.on('end',function(){
-					if(i == ps.length - 1){
+					console.log(i + ' ' + ps.length);
+					/*if(i == ps.length){
+						console.log("made it to the redirect");
 						//MAKE SURE THIS WORKS
-						response.redirect('/edit_show');
-					}
+						
+					}*/
 				});
 			}
 		});
