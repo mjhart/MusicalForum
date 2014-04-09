@@ -17,7 +17,9 @@ var date = new Date().toString();
 // submit ticket request
 app.post('/tickets', function(req, res) {
 	var email = req.body.email;
-	console.log(req.body.date);
+	
+	var old_date = parse_showtime(req.body.date);
+	console.log(old_date);
 	var date = parseDate(req.body.date);
 	//var date = parseDate("Wed Apr 09 2014 17:43:23 GMT-0400 (EDT)");
 	console.log(date.getTime());
@@ -42,7 +44,7 @@ app.post('/tickets', function(req, res) {
 					console.log("here1");
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1  AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-					conn.query(sql ,[date.toString()])
+					conn.query(sql ,[old_date])
 					.on('row', function(row) {
 						var p_id = row.p_id;
 						var numTix = row.tickets;
@@ -65,6 +67,7 @@ app.post('/tickets', function(req, res) {
 										for(var i=0; i<people.length; i++) {
 											var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
 											conn.query(sql2, [p_id, people[i], email]);
+											console.log("inserting");
 										}
 
 										// send response
@@ -82,23 +85,28 @@ app.post('/tickets', function(req, res) {
 
 					// check email is reserved
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
-					.on('end', function(res) {
-						if(res.rowCount==1) {
-							var numTix = res.row[0].tickets_alloted;
+					.on('row', function(row) {
+						//if(res.rowCount==1) {
+							if(true) {
+							console.log(row);
+							var numTix = row.tickets_alloted;
 
+							console.log("here");
 							// count already reserved tickets for email
-							var sql = "SELECT * FROM Attendees WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+							var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 							conn.query(sql, [email])
 							.on('end', function(res) {
-								if(res.rowCount + people.length <= tickets_allocated) {
+								if(res.rowCount + people.length <= numTix) {
 
+									console.log("here2");
 									// get p_id and reserves of date/time and current show
 									var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-									conn.query(sql ,[date])
+									conn.query(sql ,[old_date])
 									.on('row', function(row) {
 										var p_id = row.p_id;
 										var numRes = row.reserves;
 
+										console.log("here3");
 										// count total tickets already reserved for performance
 										var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 										conn.query(sql ,[p_id])
@@ -108,6 +116,7 @@ app.post('/tickets', function(req, res) {
 												for(var i=0; i<people.length; i++) {
 													var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
 													conn.query(sql2, [p_id, people[i], email]);
+													console.log("inserting");
 												}
 
 												// send response
@@ -209,15 +218,15 @@ app.get('/show', function(request, response){
 	currshow = -1;
 	lasttime = 0;
 	d = new Date();
-	var show_sql = 'SELECT show_id, page_live_date FROM ShowInfo ORDER BY page_live_date DESC'
+	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY show_id DESC'
 	var showq = conn.query(show_sql);
 	var showinfo = {};
 	showq.on('row', function(row){
-		var liveDate = new Date(row.page_live_date);
+		var liveDate = new Date(row.reserve_live_date);
 		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
 			console.log(row.show_id);
 			currshow = row.show_id;
-			lasttime = row.page_live_date;
+			lasttime = row.reserve_live_date;
 		}
 	});
 	showq.on('end', function(){
@@ -293,11 +302,14 @@ app.get('/attendee/:date', function(request, response){
 //Should only be called for people from reserve page
 app.get('/rtickets', function(request, response){
 
-	
+	var old_date = parse_showtime(request.query.date);
+	var date = parseDate(request.query.date);
+	var email = request.query.email;
+	var cur = new Date();
 
-	console.log(p_date.getTime());
+	console.log(date.getTime());
 	console.log("called");
-	if(p_date.getTime() > cur.getTime() + 216000000) {
+	if(date.getTime() > cur.getTime() + 216000000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
 			var id = row.show_id;
@@ -308,7 +320,7 @@ app.get('/rtickets', function(request, response){
 
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-					conn.query(sql ,[p_date])
+					conn.query(sql ,[old_date])
 					.on('row', function(row) {
 						var p_id = row.p_id;
 						var numTix = row.tickets;
@@ -340,9 +352,9 @@ app.get('/rtickets', function(request, response){
 
 					// check email is reserved
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
-					.on('end', function(res) {
-						if(res.rowCount==1) {
-							var numTix = res.row[0].tickets_alloted;
+					.on('row', function(row) {
+						if(true) {
+							var numTix = row.tickets_alloted;
 
 							// count already reserved tickets for email
 							var sql = "SELECT * FROM Attendees WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -352,7 +364,7 @@ app.get('/rtickets', function(request, response){
 
 									// get p_id and reserves of date/time and current show
 									var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-									conn.query(sql ,[p_date])
+									conn.query(sql ,[old_date])
 									.on('row', function(row) {
 										var p_id = row.p_id;
 										var numRes = row.reserves;
@@ -478,5 +490,45 @@ function parseDate(str) {
 	console.log(d);
 	return d;
 }
+
+function parse_showtime(showtime) {
+					// 1993-03-17T08%3A30
+					// 0-4 1993
+					// 5 -
+					// 6-7 03
+					// 8 -
+					// 9-10 17
+					// 11-15 T21%3
+					// 16-18 A12
+					var d = new Date();
+					var year = d.getFullYear();
+					var month = showtime.slice(0,2);
+					var day = showtime.slice(2,4);
+					var hour = showtime.slice(4,6);
+					var minutes = showtime.slice(6,8)
+					var am_pm = "AM";
+					/*
+					console.log("yr:  "+year);
+					console.log("mth: "+month);					
+					console.log("day: "+day);
+					console.log("hr:  "+hour);
+					console.log("min: "+minutes);
+					*/
+					months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
+					for (var i = 0; i < months.length; i += 1) {
+						if (months[i].number == month) {
+							month = months[i].month;
+						}
+					}
+					if (hour > 12) {
+						hour = hour-12;
+						am_pm = "PM";
+					}
+					else {
+						hour = hour.slice(1);
+					}
+					var show = (month + " " + day + " at " + hour + ":" + minutes + " " + am_pm); 
+					return show;
+				}
 
 app.listen(8080);

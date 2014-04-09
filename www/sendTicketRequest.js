@@ -29,8 +29,6 @@ function sendInfo(e) {
             console.log("Request status not 200");              
             // something went wrong, check request status
             // hint 403 means forbidden, maybe forgot username
-            var num_tickets = 4;
-            post_form(parseInt(formatted_date,num_tickets)); 
         }
         // Fill me in!
     }, false);
