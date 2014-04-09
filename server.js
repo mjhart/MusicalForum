@@ -17,45 +17,111 @@ var date = new Date().toString();
 // submit ticket request
 app.post('/tickets', function(req, res) {
 	var email = req.body.email;
-	var date = new Date(req.body.date);
+	//var date = new Date(req.body.date);
+	var date = new Date("Wed Apr 09 2014 17:43:23 GMT-0400 (EDT)");
+	console.log(date.getTime());
 	var people = req.body.people.split(",");
 
-	curShowLive(postLiveTickets(email, date, people), postResTickets(email, date, people));
-});
+	var cur = new Date();
+
+	// check that its not within 6 hours of show
+	if(date.getTime() > cur.getTime() + 216000000) {
+		console.log("called");
 
 
-
-function postLiveTickets(email, date, people) {
-	var currentTime = new Date().getTime();
-	if(showTime-date.getTime() > 3600000) {
-
-		// find p_id and num tickets for performance
-		var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-		conn.query(sql ,[date])
+		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
-			var p_id = row.p_id;
-			var numTix = row.tickets;
+			var id = row.show_id;
+			conn.query("SELECT page_live_date FROM ShowInfo WHERE show_id = $1", [id])
+			.on('row', function(row) {
+				var live_date = new Date(row.page_live_date);
+				if(cur.getTime() > live_date.getTime()) { // show is live
+					console.log("live");
 
-			// count total tickets already reserved for performance
-			var sql = "SELECT * FROM Attendees WHERE p_id = $1";
-			conn.query(sql ,[p_id])
-			.on('end', function(res) {
-				var count = res.rowCount;
-				if(people.length + count <= numTix) {
+					console.log("here1");
+					// find p_id and num tickets for performance
+					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+					conn.query(sql ,[date])
+					.on('row', function(row) {
+						var p_id = row.p_id;
+						var numTix = row.tickets;
 
-					// count how many tickets to performance for this email
-					conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
-					.on('end', function(res) {
-						if(res.rowCount + people.length < 3) {
-							for(p in people) {
-								var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
-								conn.query(sql2, [row.p_id, p, email]);
+						console.log("here2");
+						// count total tickets already reserved for performance
+						var sql = "SELECT * FROM Attendees WHERE p_id = $1";
+						conn.query(sql ,[p_id])
+						.on('end', function(res) {
+							var count = res.rowCount;
+							if(people.length + count <= numTix) {
+
+								console.log("here3");
+								// count how many tickets to performance for this email
+								conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
+								.on('end', function(res) {
+									if(res.rowCount + people.length < 3) {
+										for(p in people) {
+											var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
+											conn.query(sql2, [row.p_id, p, email]);
+										}
+
+										// send response
+									}
+									else {
+										// cannot request that many tickets
+									}
+								});
 							}
+						});
+					});
+				}
+				else { // show is not live
+					console.log("not live");
 
-							// send response
+					// check email is reserved
+					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
+					.on('end', function(res) {
+						if(res.rowCount==1) {
+							var numTix = res.row[0].tickets_alloted;
+
+							// count already reserved tickets for email
+							var sql = "SELECT * FROM Attendees WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+							conn.query(sql, [email])
+							.on('end', function(res) {
+								if(res.rowCount + people.length <= tickets_allocated) {
+
+									// get p_id and reserves of date/time and current show
+									var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+									conn.query(sql ,[date])
+									.on('row', function(row) {
+										var p_id = row.p_id;
+										var numRes = row.reserves;
+
+										// count total tickets already reserved for performance
+										var sql = "SELECT * FROM Attendees WHERE p_id = $1";
+										conn.query(sql ,[p_id])
+										.on('end', function(res) {
+											var count = res.rowCount;
+											if(count + people.length <= numRes) {
+												for(p in people) {
+													var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
+													conn.query(sql2, [row.p_id, p, email]);
+												}
+
+												// send response
+											}
+											else {
+												// show has no tickets left
+											}
+										});
+									});
+								}
+								else {
+									//already reserved allocated number of tickets
+								}
+							});
 						}
 						else {
-							// cannot request that many tickets
+							//error
 						}
 					});
 				}
@@ -63,86 +129,9 @@ function postLiveTickets(email, date, people) {
 		});
 	}
 	else {
-		//cannot request this close to show
+		console.log("cannot get tickets this close to show");
 	}
-}
-
-function postResTickets(email, date, people) {
-	var currentTime = new Date().getTime();
-	if(showTime-date.getTime() > 3600000) {
-
-		// check email is reserved
-		conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
-		.on('end', function(res) {
-			if(res.rowCount==1) {
-				var numTix = res.row[0].tickets_alloted;
-
-				// count already reserved tickets for email
-				var sql = "SELECT * FROM Attendees WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-				conn.query(sql, [email])
-				.on('end', function(res) {
-					if(res.rowCount + people.length <= tickets_allocated) {
-
-						// get p_id and reserves of date/time and current show
-						var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-						conn.query(sql ,[date])
-						.on('row', function(row) {
-							var p_id = row.p_id;
-							var numRes = row.reserves;
-
-							// count total tickets already reserved for performance
-							var sql = "SELECT * FROM Attendees WHERE p_id = $1";
-							conn.query(sql ,[p_id])
-							.on('end', function(res) {
-								var count = res.rowCount;
-								if(count + people.length <= numRes) {
-									for(p in people) {
-										var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
-										conn.query(sql2, [row.p_id, p, email]);
-									}
-
-									// send response
-								}
-								else {
-									// show has no tickets left
-								}
-							});
-						});
-					}
-					else {
-						//already reserved allocated number of tickets
-					}
-				});
-			}
-			else {
-				//error
-			}
-		});
-
-	}
-	else {
-		//cannot request this close to show
-	}
-}
-
-function curShowLive(func1, func2) {
-	var cur = new Date();
-	console.log("called");
-	conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
-	.on('row', function(row) {
-		var id = row.show_id;
-		conn.query("SELECT page_live_date FROM ShowInfo WHERE show_id = $1", [id])
-		.on('row', function(row) {
-			var show = new Date(row.page_live_date);
-			if(cur.getTime() > show.getTime()) { // show is live
-				func1();
-			}
-			else { // show is not live
-				func2();
-			}
-		});
-	});
-}
+});
 
 app.get('/test', function(req, res) {
 	curShowLive(function(){}, function(){});
@@ -295,7 +284,7 @@ app.get('/rtickets', function(request, response){
 	var email = request.query.email;
 	var cur = new Date();
 	console.log("called");
-	if(s_date.getTime() > cur.getTime() + 216000000) {
+	if(p_date.getTime() > cur.getTime() + 216000000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
 			var id = row.show_id;

@@ -100,5 +100,9 @@ function post_form(date,num_tickets) {
     s.setAttribute('value',"Submit");  
     s.setAttribute('id','ticketholderInfo');
     s.style.backgroundColor = "#fcf";
-    form.appendChild(s);     
+    form.appendChild(s);  
+
+    var ticketForm = document.getElementById('ticketForm');
+    ticketForm.addEventListener('submit', sendTInfo, false);
+    console.log("HELLO");   
 }

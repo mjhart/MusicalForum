@@ -1,6 +1,6 @@
 window.addEventListener('load', function(){
-    getAttendeeInfo();
-    jQuery(".expandable-panel").click(getAttendeeInfo); 
+    //getAttendeeInfo();
+    //jQuery(".expandable-panel").click(getAttendeeInfo); 
 }, false);
 
 
