@@ -184,14 +184,18 @@ app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, res
 				//var showinfo = {title : row.title, director : row.director, musical_director : row.mdirector, show_info : row.show_info,
 				//	page_live : row.page_live_date, res_live : row.reserve_live_date};
 				showinfo = row;
+
 				console.log("showinfo \n" + showinfo);
 				
 			});
 			q.on('end', function(){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
+				var counter = 0;
 				q1.on('row', function(row){
 					console.log(row);
-					performances.push(row);
+					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
+					counter = counter + 1;
+					performances.push(r);
 				});
 				q1.on('end', function(){
 					console.log("at the end");
@@ -245,11 +249,15 @@ app.get('/show', function(request, response){
 			});
 			q.on('end', function(){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
+				var counter = 1;
 				q1.on('row', function(row){
 					console.log(row);
+					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
+					counter = counter + 1;
 					//all info in p_info will be separately by newline, and the first line will be the performance time and id
 					//var p_info = row.date_time;
-					performances.push(row);
+					performances.push(r);
+					console.log(r);
 					/*var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
 					q2.on('row',function(row){
 						console.log(row);
@@ -262,7 +270,8 @@ app.get('/show', function(request, response){
 
 				});
 				q1.on('end', function(){
-					response.render('tickets.html', {info : showinfo, p : performances});
+					console.log({info : showinfo, p : performances});
+					response.render('tickets2.html', {info : showinfo, p : performances});
 				});
 			});
 		}
@@ -275,6 +284,7 @@ app.get('/show', function(request, response){
 
 app.get('/attendee/:date', function(request, response){
 	console.log("attendee called");
+	console.log(request.params.date);
 	var attendees = [];
 	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 ';
 	var q = conn.query(sql, [request.params.date]);
@@ -291,11 +301,11 @@ app.get('/attendee/:date', function(request, response){
 //Should only be called for people from reserve page
 app.get('/rtickets', function(request, response){
 
-	var p_date = new Date(request.query.date);
-	var email = request.query.email;
-	var cur = new Date();
+	
+
+	console.log(p_date.getTime());
 	console.log("called");
-	if(s_date.getTime() > cur.getTime() + 216000000) {
+	if(p_date.getTime() > cur.getTime() + 216000000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
 			var id = row.show_id;
