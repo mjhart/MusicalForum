@@ -17,15 +17,16 @@ var date = new Date().toString();
 // submit ticket request
 app.post('/tickets', function(req, res) {
 	var email = req.body.email;
-	//var date = new Date(req.body.date);
-	var date = new Date("Wed Apr 09 2014 17:43:23 GMT-0400 (EDT)");
+	console.log(req.body.date);
+	var date = parseDate(req.body.date);
+	//var date = parseDate("Wed Apr 09 2014 17:43:23 GMT-0400 (EDT)");
 	console.log(date.getTime());
 	var people = req.body.people.split(",");
 
 	var cur = new Date();
 
 	// check that its not within 6 hours of show
-	if(date.getTime() > cur.getTime() + 216000000) {
+	if(date.getTime() > cur.getTime() ) {
 		console.log("called");
 
 
@@ -37,11 +38,11 @@ app.post('/tickets', function(req, res) {
 				var live_date = new Date(row.page_live_date);
 				if(cur.getTime() > live_date.getTime()) { // show is live
 					console.log("live");
-
+					console.log(id);
 					console.log("here1");
 					// find p_id and num tickets for performance
-					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-					conn.query(sql ,[date])
+					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1  AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+					conn.query(sql ,[date.toString()])
 					.on('row', function(row) {
 						var p_id = row.p_id;
 						var numTix = row.tickets;
@@ -58,10 +59,12 @@ app.post('/tickets', function(req, res) {
 								// count how many tickets to performance for this email
 								conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
 								.on('end', function(res) {
+									console.log(res.rowCount);
 									if(res.rowCount + people.length < 3) {
-										for(p in people) {
+										console.log(people);
+										for(var i=0; i<people.length; i++) {
 											var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
-											conn.query(sql2, [row.p_id, p, email]);
+											conn.query(sql2, [p_id, people[i], email]);
 										}
 
 										// send response
@@ -102,9 +105,9 @@ app.post('/tickets', function(req, res) {
 										.on('end', function(res) {
 											var count = res.rowCount;
 											if(count + people.length <= numRes) {
-												for(p in people) {
+												for(var i=0; i<people.length; i++) {
 													var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
-													conn.query(sql2, [row.p_id, p, email]);
+													conn.query(sql2, [p_id, people[i], email]);
 												}
 
 												// send response
@@ -464,5 +467,16 @@ app.post('/new_show', function(request, response){
 		});
 	});
 });
+
+function parseDate(str) {
+	console.log(str);
+	var d = new Date();
+	d.setMonth(parseInt(str.substring(0,2))-1);
+	d.setDate(parseInt(str.substring(2,4)));
+	d.setHours(parseInt(str.substring(4,6)));
+	d.setMinutes(str.substring(6,8));
+	console.log(d);
+	return d;
+}
 
 app.listen(8080);
