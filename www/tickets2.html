@@ -100,11 +100,14 @@
 					<input type="text" id="email" name="email" placeholder="E-mail"><br>
 					<select id="date">
 					  <option value="#">Date</option>
-					  <option value="February 20 at 8:00 PM">February 20 at 8:00 PM</option>
+					  {{#p}}
+					  	<option value="{{date_time}}">{{date_time}}</option>
+					  {{/p}}
+					  <!--<option value="February 20 at 8:00 PM">February 20 at 8:00 PM</option>
 					  <option value="February 21 at 8:00 PM">February 21 at 8:00 PM</option>
 					  <option value="February 22 at 2:00 PM">February 22 at 2:00 PM</option>
 					  <option value="February 22 at 8:00 PM">February 22 at 8:00 PM</option>
-					  <option value="February 23 at 8:00 PM">February 23 at 8:00 PM</option>
+					  <option value="February 23 at 8:00 PM">February 23 at 8:00 PM</option>-->
 					</select> <br>
 					<input type="submit" value="Request tickets" style="background-color:#FCF;">
 				</form>
@@ -115,16 +118,19 @@
 
 			<div class="cushycms" id="accordion">
 				<h1 id="performances"> Performances </h1>
+				{{#p}}
+
 			    <div class="expandable-panel" id="cp-1">
 			     <div class="expandable-panel-heading" onclick="getAttendees(this)">
-			         <h2 id="datemmddtttt">February 20 at 8:00 PM</h2>
+			         <h2 id="{{date_time}}">{{date_time}}</h2>
 			     </div>
 			     <div class="expandable-panel-content">
 			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
 			     </div>
 			  </div> 
+			  {{/p}}
 			     
-			    <div class="expandable-panel" id="cp-2">
+			    <!-- <div class="expandable-panel" id="cp-2">
 			     <div class="expandable-panel-heading">
 			         <h2 id="datemmddtttt">February 21 at 8:00 PM</h2>
 			     </div>
@@ -158,7 +164,7 @@
 			     <div class="expandable-panel-content">
 			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
 			     </div>
-			  </div> 		  			 
+			  </div>  -->		  			 
 			
 			</div>
 		</div>
