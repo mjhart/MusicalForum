@@ -17,8 +17,13 @@ var date = new Date().toString();
 
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
-})
+});
 // submit ticket request
+
+app.get('/tickets.html',function(req,res){
+	res.redirect('/show');
+});
+
 app.post('/tickets', function(req, res) {
 	var email = req.body.email;
 	console.log(req.body.date);
