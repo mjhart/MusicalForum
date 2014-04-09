@@ -23,6 +23,8 @@ app.post('/tickets', function(req, res) {
 	curShowLive(postLiveTickets(email, date, people), postResTickets(email, date, people));
 });
 
+
+
 function postLiveTickets(email, date, people) {
 	var currentTime = new Date().getTime();
 	if(showTime-date.getTime() > 3600000) {
@@ -213,6 +215,7 @@ app.get('/show', function(request, response){
 	d = new Date();
 	var show_sql = 'SELECT show_id, page_live_date FROM ShowInfo ORDER BY page_live_date DESC'
 	var showq = conn.query(show_sql);
+	var showinfo = {};
 	showq.on('row', function(row){
 		var liveDate = new Date(row.page_live_date);
 		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
@@ -234,7 +237,8 @@ app.get('/show', function(request, response){
 				var director = row.director;
 				var music_director = row.musical_director;
 				var show_info = row.show_info;
-				var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
+				//var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
+				showinfo = row;
 				console.log(showinfo);
 				
 				
@@ -244,21 +248,21 @@ app.get('/show', function(request, response){
 				q1.on('row', function(row){
 					console.log(row);
 					//all info in p_info will be separately by newline, and the first line will be the performance time and id
-					var p_info = row.p_id+' '+row.date_time;
-					//performances.push(p_info);
-					var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
+					//var p_info = row.date_time;
+					performances.push(row);
+					/*var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
 					q2.on('row',function(row){
 						console.log(row);
 						p_info += '\n'+row.name;
 
-					});
-					q2.on('end', function(){
-						performances.push(p_info);
-					});
+					});*/
+					/*q2.on('end', function(){
+						//performances.push(p_info);
+					});*/
 
 				});
 				q1.on('end', function(){
-					response.render('show.html', {info : [showinfo, performances]});
+					response.render('tickets.html', {info : showinfo, p : performances});
 				});
 			});
 		}
@@ -272,7 +276,7 @@ app.get('/show', function(request, response){
 app.get('/attendee/:date', function(request, response){
 	console.log("attendee called");
 	var attendees = [];
-	var sql = 'SELECT name FROM Attendees WHERE p_id = $1';
+	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 ';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
 		console.log(row);
@@ -371,91 +375,45 @@ app.get('/rtickets', function(request, response){
 	else {
 		response.send("0");
 	}
-
-	/*
-	var num = 0;
-	var res_left = 0;
-	var taken = 0;
-	currshow = -1;
-	lasttime = 0;
-	d = new Date();
-	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY reserve_live_date DESC'
-	var showq = conn.query(show_sql);
-	showq.on('row', function(row){
-		var liveDate = new Date(row.reserve_live_date);
-		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
-			currshow = row.show_id;
-			lasttime = row.reserve_live_date;
-		}
-	});
-	showq.on('end', function() {
-		if(currshow != -1){
-			var res_sql = 'SELECT reserves FROM Performances WHERE date_time = $1';
-			var q = conn.query(res_sql, [request.query.date]);
-			q.on('row', function(row){
-				res_left = row.reserves;
-			});
-			q.on('end', function(){
-				var tickets_taken = 'SELECT COUNT(*) as c FROM Attendees as a, Performances as p WHERE a.p_id = p.p_id and p.date_time = $1';
-				var qtickets = conn.query(tickets_taken, [request.query.date]);
-				qtickets.on('row',function(row){
-					taken = row.c;
-				});
-				qtickets.on('end', function(){
-					console.log("almost there");
-					var sql = 'SELECT tickets_alloted FROM Reserves WHERE show_id = '+currshow+' and email = $2';
-					var q1 = conn.query(sql, [request.query.email]);
-					q1.on('row', function(row){
-						num = row.tickets_alloted;
-					});
-					q1.on('end', function(){
-						console.log("made it to the end");
-						num = Math.min(num,(res_left-taken));
-						//response.send(num);
-						response.send(num.toString());
-						console.log(num);
-					});
-				});
-
-			});
-		}
-		else{
-			response.send("There is no show to reserve for");
-		}
-	});
-*/
 	
 });
 //MAtt fucked everythign up
 app.get('/csv/:date', function(request, response){
 	
 
+	
+	
 	query_ans = '';
 
 	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.date_time = $1 AND p.p_id = a.p_id';
+	//var sql = 'SELECT * from Attendees';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
-		ans += '"'+row.name+'",';
+		query_ans += row.name+'\n';
+		console.log(query_ans);
 	});
 	q.on('end', function(){
-		ans = ans.substring(0,ans.length);
-	});
+		query_ans = query_ans.substring(0,query_ans.length);
+		console.log(query_ans);
+	
 
-	csv()
-	.from.string(ans)
-	.to.stream(fs.createWriteStream('/tmp.csv'))
-	.transform( function(row){
-		row.unshift(row.pop());
-		return row;
-	})
-	.on('record', function(row,index){
-		console.log(JSON.stringify(row));
-	})
-	.on('close', function(count){
-		console.log('Number of Attendees: ' + count);
-	})
-	.on('error', function(error){
-		console.log(error.message);
+		csv()
+		.from.string(query_ans)
+		.to.stream(fs.createWriteStream(__dirname+'/tmp.csv'))
+		/*.transform( function(row){
+			//row.unshift(row.pop());
+			//console.log(row);
+			return row;
+		})*/
+		.on('record', function(row,index){
+			console.log(JSON.stringify(row));
+		})
+		.on('close', function(count){
+			console.log('Number of Attendees: ' + count);
+		})
+		.on('error', function(error){
+			console.log(error.message);
+		});
 	});
 
 });
