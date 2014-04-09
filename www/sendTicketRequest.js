@@ -23,7 +23,7 @@ function sendInfo(e) {
             console.log("Request status 200");          
             // do something with loaded content
             var num_tickets = request.responseText;
-            post_form(parseInt(formatted_date,num_tickets));   
+            post_form(unformatted_date, parseInt(num_tickets));   
         }
         else {
             console.log("Request status not 200");              

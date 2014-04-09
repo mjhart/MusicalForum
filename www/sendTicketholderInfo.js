@@ -6,7 +6,7 @@ function sendTInfo(e) {
     // create a FormData object from our form
     var fd = new FormData();
     fd.append("email",document.getElementById('email').value);
-    fd.append("date",document.getElementById('date').value);
+    fd.append("date",format_date(document.getElementById('date').value));
     var inputs = document.getElementsByTagName('input');
     var people = "";
     for (var i=2; i <inputs.length-1; i++) {
@@ -23,4 +23,32 @@ function sendTInfo(e) {
     var req = new XMLHttpRequest();
     req.open('POST', '/tickets', true);
     req.send(fd);
+}
+
+
+function format_date(date) {    
+    console.log("date "+ date);  
+    var date_split = date.split(" ");
+    var month = date_split[0];
+    var month_num = "";
+    months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
+    for (var i = 0; i < months.length; i += 1) {
+        if (months[i].month == month) {
+            month_num = months[i].number;
+        }
+    }
+    var day = date_split[1];
+    var time = date_split[3];
+    var time_split = time.split(":");
+    if (date_split[4] == "PM") {
+        time_split[0] = (parseInt(time_split[0]) + 12).toString();
+    }
+    time = time_split[0] + time_split[1];
+    if (time.length == 3) {
+        time = "0" + time;
+    }
+
+    date = month_num + day + time;  
+    console.log("date "+ date);  
+    return date;  
 }
