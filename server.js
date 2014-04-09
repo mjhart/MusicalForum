@@ -23,6 +23,8 @@ app.post('/tickets', function(req, res) {
 	curShowLive(postLiveTickets(email, date, people), postResTickets(email, date, people));
 });
 
+
+
 function postLiveTickets(email, date, people) {
 	var currentTime = new Date().getTime();
 	if(showTime-date.getTime() > 3600000) {
@@ -96,7 +98,7 @@ function postResTickets(email, date, people) {
 								if(count + people.length <= numRes) {
 									for(p in people) {
 										var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
-										onn.query(sql2, [row.p_id, p, email]);
+										conn.query(sql2, [row.p_id, p, email]);
 									}
 
 									// send response
@@ -213,6 +215,7 @@ app.get('/show', function(request, response){
 	d = new Date();
 	var show_sql = 'SELECT show_id, page_live_date FROM ShowInfo ORDER BY page_live_date DESC'
 	var showq = conn.query(show_sql);
+	var showinfo = {};
 	showq.on('row', function(row){
 		var liveDate = new Date(row.page_live_date);
 		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
@@ -234,7 +237,8 @@ app.get('/show', function(request, response){
 				var director = row.director;
 				var music_director = row.musical_director;
 				var show_info = row.show_info;
-				var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
+				//var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
+				showinfo = row;
 				console.log(showinfo);
 				
 				
@@ -244,21 +248,21 @@ app.get('/show', function(request, response){
 				q1.on('row', function(row){
 					console.log(row);
 					//all info in p_info will be separately by newline, and the first line will be the performance time and id
-					var p_info = row.p_id+' '+row.date_time;
-					//performances.push(p_info);
-					var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
+					//var p_info = row.date_time;
+					performances.push(row);
+					/*var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
 					q2.on('row',function(row){
 						console.log(row);
 						p_info += '\n'+row.name;
 
-					});
-					q2.on('end', function(){
-						performances.push(p_info);
-					});
+					});*/
+					/*q2.on('end', function(){
+						//performances.push(p_info);
+					});*/
 
 				});
 				q1.on('end', function(){
-					response.render('show.html', {info : [showinfo, performances]});
+					response.render('tickets.html', {info : showinfo, p : performances});
 				});
 			});
 		}
@@ -272,7 +276,7 @@ app.get('/show', function(request, response){
 app.get('/attendee/:date', function(request, response){
 	console.log("attendee called");
 	var attendees = [];
-	var sql = 'SELECT name FROM Attendees WHERE p_id = $1';
+	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 ';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
 		console.log(row);
@@ -343,32 +347,39 @@ app.get('/rtickets', function(request, response){
 app.get('/csv/:date', function(request, response){
 	
 
+	
+	
 	query_ans = '';
 
 	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.date_time = $1 AND p.p_id = a.p_id';
+	//var sql = 'SELECT * from Attendees';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
-		ans += '"'+row.name+'",';
+		query_ans += row.name+'\n';
+		console.log(query_ans);
 	});
 	q.on('end', function(){
-		ans = ans.substring(0,ans.length);
-	});
+		query_ans = query_ans.substring(0,query_ans.length);
+		console.log(query_ans);
+	
 
-	csv()
-	.from.string(ans)
-	.to.stream(fs.createWriteStream('/tmp.csv'))
-	.transform( function(row){
-		row.unshift(row.pop());
-		return row;
-	})
-	.on('record', function(row,index){
-		console.log(JSON.stringify(row));
-	})
-	.on('close', function(count){
-		console.log('Number of Attendees: ' + count);
-	})
-	.on('error', function(error){
-		console.log(error.message);
+		csv()
+		.from.string(query_ans)
+		.to.stream(fs.createWriteStream(__dirname+'/tmp.csv'))
+		/*.transform( function(row){
+			//row.unshift(row.pop());
+			//console.log(row);
+			return row;
+		})*/
+		.on('record', function(row,index){
+			console.log(JSON.stringify(row));
+		})
+		.on('close', function(count){
+			console.log('Number of Attendees: ' + count);
+		})
+		.on('error', function(error){
+			console.log(error.message);
+		});
 	});
 
 });
