@@ -1,7 +1,9 @@
 window.addEventListener('load', function(){
     //getAttendeeInfo();
+
     jQuery(".expandable-panel").click(function(event){
         var request = new XMLHttpRequest();
+
 
     var today = new Date();
     var date = event.target.id;

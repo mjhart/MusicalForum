@@ -5,13 +5,13 @@
 		<title>Musical Forum</title> 
 		<link rel="stylesheet" type="text/css" href="style.css"/> 
 		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
-		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
-		<script type="text/javascript" src="getShowInfo.js"></script> 		
+		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script> 
-		<script type="text/javascript" src="script.js"></script> 
+		<!--<script type="text/javascript" src="script.js"></script> -->
 		<script type="text/javascript" src="getAttendees.js"></script> 
 		<script type="text/javascript" src="jquery.js"></script> 
-		<script type="text/javascript" src="sendTicketRequest.js"></script> 		
+		<script type="text/javascript" src="sendTicketRequest.js"></script> 	
+		<script type="text/javascript" src="sendTicketholderInfo.js"></script> 
 		<style>
 		a { text-decoration: none; }
 		h1 { position: relative; }
@@ -125,7 +125,7 @@
 			         <h2 id="{{date_time}}">{{date_time}}</h2>
 			     </div>
 			     <div class="expandable-panel-content">
-			         <p> <h4> Who's Attending? </h4> <span id="attendees_{{date_time}}">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
+			         <p> <h4> Who's Attending? </h4> <span id="attendees_{{date_time}}"> </span> </p>
 			     </div>
 			  </div> 
 			  {{/p}}
