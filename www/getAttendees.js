@@ -1,16 +1,13 @@
 window.addEventListener('load', function(){
-    getAttendeeInfo();
-    jQuery(".expandable-panel").click(getAttendeeInfo); 
-}, false);
-
-
-function getAttendeeInfo(obj) {
-    // create a request
-    var request = new XMLHttpRequest();
+    //getAttendeeInfo();
+    jQuery(".expandable-panel").click(function(event){
+        var request = new XMLHttpRequest();
 
     var today = new Date();
+    var date = event.target.id;
+    console.log(date);
     // specify the type of request, URL, and flag
-    var r = request.open('GET', '/attendee/' + today.toString(),true);
+    var r = request.open('GET', '/attendee/' + date,true);
 
 // This code will be executed when the page finishes loading
     request.addEventListener('load', function(e){
@@ -24,15 +21,21 @@ function getAttendeeInfo(obj) {
             var showGoers = new Array();
             for(var i in info){
                 if(info[i].length != 0){
-                    showGoers.append(info[i]);
+                    showGoers.push(info[i].name);
                 }
             }
-            var attendees = showGoers.toString();
+            //var attendees = showGoers.toString();
+            var attendees = '';
+            for(var i in showGoers){
+                attendees += showGoers[i].toString()+', ';
+
+            }
+            console.log(attendees);
             // The id will be datemmddtttt
-            var date = obj.getElementsByTagName("h2").id;
+            
             // Get the substring so it is mmddtttt
-            date = date.substring(4);
-            document.getElementById('attendees_'+date).innerHTML = attendees;
+            //date = date.substring(4);
+            document.getElementById('attendees_'+date).innerHTML = attendees.substring(0,attendees.length-2);
         }
         else {
             console.log("Request status not 200");              
@@ -43,6 +46,21 @@ function getAttendeeInfo(obj) {
     }, false);
 
     request.send(null);   
+
+
+
+
+
+
+
+
+    }); 
+}, false);
+
+
+function getAttendeeInfo(obj) {
+    // create a request
+    
 }
 
 
