@@ -339,13 +339,12 @@ app.get('/rtickets', function(request, response){
 						conn.query(sql ,[p_id])
 						.on('end', function(res) {
 							var count = res.rowCount;
-							if(people.length + count <= numTix) {
 
 								// count how many tickets to performance for this email
 								conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
 								.on('end', function(res) {
 									var count = res.rowCount;
-									var tix = 2-count;
+									var tix = Math.min(2-count, numTix)
 									if(tix > 0) {
 										response.send(tix.toString());
 									}
@@ -353,7 +352,6 @@ app.get('/rtickets', function(request, response){
 										response.send("0");
 									}
 								});
-							}
 						});
 					});
 				}
@@ -366,10 +364,10 @@ app.get('/rtickets', function(request, response){
 							var numTix = row.tickets_alloted;
 
 							// count already reserved tickets for email
-							var sql = "SELECT * FROM Attendees WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+							var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 							conn.query(sql, [email])
 							.on('end', function(res) {
-								if(res.rowCount + people.length <= tickets_allocated) {
+								//if(res.rowCount + people.length <= tickets_allocated) {
 
 									// get p_id and reserves of date/time and current show
 									var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -384,10 +382,15 @@ app.get('/rtickets', function(request, response){
 										.on('end', function(res) {
 											var count = res.rowCount;
 											var tix = Math.min(numRes-count, numTix)
-											response.send(tix.toString());
+											if(tix > 0) {
+												response.send(tix.toString());
+											}
+											else {
+												response.send("0");
+											}
 										});
 									});
-								}
+								//}
 							});
 						}
 					});						
