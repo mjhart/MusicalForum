@@ -14,7 +14,16 @@ app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 
+
+app.get('/csvload/:date_time', function(req, res){
+	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
+});
 // submit ticket request
+
+app.get('/tickets.html',function(req,res){
+	res.redirect('/show');
+});
+
 app.post('/tickets', function(req, res) {
 	var email = req.body.email;
 	
@@ -413,7 +422,7 @@ app.get('/csv/:date', function(request, response){
 
 		csv()
 		.from.string(query_ans)
-		.to.stream(fs.createWriteStream(__dirname+'/tmp.csv'))
+		.to.stream(fs.createWriteStream(__dirname+'/'+request.params.date+'.csv'))
 		/*.transform( function(row){
 			//row.unshift(row.pop());
 			//console.log(row);
@@ -428,6 +437,7 @@ app.get('/csv/:date', function(request, response){
 		.on('error', function(error){
 			console.log(error.message);
 		});
+
 	});
 
 });
