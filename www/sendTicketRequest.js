@@ -76,7 +76,11 @@ function post_form(date,num_tickets) {
     var height = (num_tickets*90)+50;
     document.getElementById('formbox').style.height = height.toString()+"px"; 
     var formbox2 = document.getElementById('formbox2');
+	while (formbox2.firstChild) {
+    	formbox2.removeChild(formbox2.firstChild);
+	}
     var form = document.createElement("form");
+
     formbox2.appendChild(form);
     form.id = "ticketForm";
     form.setAttribute('method',"POST");
