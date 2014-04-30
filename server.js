@@ -224,7 +224,7 @@ app.get('/show', function(request, response){
 	currshow = -1;
 	lasttime = 0;
 	d = new Date();
-	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY show_id DESC'
+	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
 	var showq = conn.query(show_sql);
 	var showinfo = {};
 	showq.on('row', function(row){
@@ -314,7 +314,7 @@ app.get('/rtickets', function(request, response){
 	var cur = new Date();
 
 	console.log(date.getTime());
-	console.log("called");
+	console.log("called rtickets");
 	if(date.getTime() > cur.getTime() + 21600000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
@@ -454,43 +454,50 @@ app.post('/new_show', function(request, response){
 	var reserve_live = request.body.r_live_at;
 	var performance = request.body.show_array;
 	var csv_string = request.body.csv_string;
-	console.log(performance);
-	var curr_show = -1;
-	console.log("in new show");
-	q = conn.query('INSERT INTO ShowInfo VALUES (NULL, $1, $2, $3, $4, $5, $6);',[title,director,mdirector,showinfo,page_live,reserve_live]);
-	q.on('end', function(){
-		console.log("finished puttint in show info");
-		var sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC limit 1;'
-		q1 = conn.query(sql);
-		q1.on('row',function(row){
-			curr_show = row.show_id;
-			console.log(curr_show);
+	var live_date = new Date(page_live);
+	var res_date = new Date(reserve_live);
+	if(live_date.getTime() < res_date.getTime()){
+		response.send("ERROR: live date must be after reserve date");
+	}
+	else{
+		console.log(performance);
+		var curr_show = -1;
+		console.log("in new show");
+		q = conn.query('INSERT INTO ShowInfo VALUES (NULL, $1, $2, $3, $4, $5, $6);',[title,director,mdirector,showinfo,page_live,reserve_live]);
+		q.on('end', function(){
+			console.log("finished puttint in show info");
+			var sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC limit 1;'
+			q1 = conn.query(sql);
+			q1.on('row',function(row){
+				curr_show = row.show_id;
+				console.log(curr_show);
+			});
+			q1.on('end', function(){
+				var rs = csv_string.split(',');
+				console.log("in the end");
+				console.log(rs);
+				for(var j=0;j<rs.length - 1;j=j+3){
+					q3 = conn.query('INSERT INTO Reserves VALUES ($1, $2, $3, $4);',[curr_show,rs[j],rs[j+2],rs[j+1]]).on('error', console.error);
+				}
+				var ps = performance.split(',');
+				console.log(ps);
+				for(var i=0;i<ps.length;i=i+3){
+					//var p = ps[i];
+					//console.log(p + " " + i);
+					//var p_info = p.split(',');
+					q2 = conn.query('INSERT INTO Performances VALUES ($1, NULL, $2, $3, $4);', [curr_show, ps[i], ps[i+1], ps[i+2]]).on('error', console.error);
+					q2.on('end',function(){
+						console.log(i + ' ' + ps.length);
+						/*if(i == ps.length){
+							console.log("made it to the redirect");
+							//MAKE SURE THIS WORKS
+							
+						}*/
+					});
+				}
+			});
 		});
-		q1.on('end', function(){
-			var rs = csv_string.split(',');
-			console.log("in the end");
-			console.log(rs);
-			for(var j=0;j<rs.length - 1;j=j+3){
-				q3 = conn.query('INSERT INTO Reserves VALUES ($1, $2, $3, $4);',[curr_show,rs[j],rs[j+2],rs[j+1]]).on('error', console.error);
-			}
-			var ps = performance.split(',');
-			console.log(ps);
-			for(var i=0;i<ps.length;i=i+3){
-				//var p = ps[i];
-				//console.log(p + " " + i);
-				//var p_info = p.split(',');
-				q2 = conn.query('INSERT INTO Performances VALUES ($1, NULL, $2, $3, $4);', [curr_show, ps[i], ps[i+1], ps[i+2]]).on('error', console.error);
-				q2.on('end',function(){
-					console.log(i + ' ' + ps.length);
-					/*if(i == ps.length){
-						console.log("made it to the redirect");
-						//MAKE SURE THIS WORKS
-						
-					}*/
-				});
-			}
-		});
-	});
+	}
 });
 
 function parseDate(str) {
