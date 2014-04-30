@@ -104,7 +104,7 @@ function post_form(date,num_tickets) {
         name_id = "name"+num.toString();
         input.setAttribute('name',name_id);
         input.setAttribute('id',name_id);
-        input.setAttribute('placeholder','Ticketholder '+num.toString());  
+        input.setAttribute('placeholder','Full Name of Ticketholder '+num.toString());  
         form.appendChild(input);      
     } 
     var s = document.createElement("input"); //input element, Submit button
