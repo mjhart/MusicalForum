@@ -12,28 +12,37 @@ function sendInfo(e) {
     var request = new XMLHttpRequest();
 
     var email = document.getElementById('email').value;
-    var unformatted_date = document.getElementById('date').value;
-    var formatted_date = format_date(unformatted_date); 
+    console.log(email);        
+    var regex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/;   
+    if (regex.test(email.toUpperCase()) == false) {
+        alert("Please include a valid email address. \n" + email + " is not a valid email address");
+    }
+    else {  
+        var unformatted_date = document.getElementById('date').value;
+        var formatted_date = format_date(unformatted_date); 
 
-    // specify the type of request, URL, and flag
-    var r = request.open('GET','/rtickets?email='+email+'&date='+formatted_date,true);   
+        // specify the type of request, URL, and flag
+        var r = request.open('GET','/rtickets?email='+email+'&date='+formatted_date,true);   
 
-    request.addEventListener('load', function(e){
-        if (request.status == 200) {
-            console.log("Request status 200");          
-            // do something with loaded content
-            var num_tickets = request.responseText;
-            post_form(unformatted_date, parseInt(num_tickets));   
-        }
-        else {
-            console.log("Request status not 200");              
-            // something went wrong, check request status
-            // hint 403 means forbidden, maybe forgot username
-        }
+        request.addEventListener('load', function(e){
+            if (request.status == 200) {
+                console.log("Request status 200");          
+                // do something with loaded content
+                var num_tickets = request.responseText;
+                post_form(unformatted_date, parseInt(num_tickets));   
+            }
+            else {
+                console.log("Request status not 200");              
+                // something went wrong, check request status
+                // hint 403 means forbidden, maybe forgot username
+            }
+    
         // Fill me in!
     }, false);
 
-    request.send(null);   
+    }
+
+   // request.send(null);   
 }
 
 
