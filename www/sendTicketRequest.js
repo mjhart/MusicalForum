@@ -82,7 +82,7 @@ function format_date(date) {
 }
 
 function post_form(date,num_tickets) {   
-    var height = (num_tickets*90)+50;
+    var height = (num_tickets*36)+215;
     document.getElementById('formbox').style.height = height.toString()+"px"; 
     var formbox2 = document.getElementById('formbox2');
 	while (formbox2.firstChild) {
