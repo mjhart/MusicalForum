@@ -30,7 +30,6 @@ app.post('/tickets', function(req, res) {
 	var old_date = parse_showtime(req.body.date);
 	console.log(old_date);
 	var date = parseDate(req.body.date);
-	//var date = parseDate("Wed Apr 09 2014 17:43:23 GMT-0400 (EDT)");
 	console.log(date.getTime());
 	var people = req.body.people.split(",");
 
@@ -68,7 +67,7 @@ app.post('/tickets', function(req, res) {
 
 								console.log("here3");
 								// count how many tickets to performance for this email
-								conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
+								conn.query("SELECT * FROM Attendees AS a, Performances AS p WHERE a.p_id = p.p_id AND a.email = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 								.on('end', function(res) {
 									console.log(res.rowCount);
 									if(res.rowCount + people.length < 3) {
@@ -127,8 +126,6 @@ app.post('/tickets', function(req, res) {
 													conn.query(sql2, [p_id, people[i], email]);
 													console.log("inserting");
 												}
-
-												// send response
 											}
 											else {
 												// show has no tickets left
@@ -318,7 +315,7 @@ app.get('/rtickets', function(request, response){
 
 	console.log(date.getTime());
 	console.log("called");
-	if(date.getTime() > cur.getTime() + 216000000) {
+	if(date.getTime() > cur.getTime() + 21600000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
 			var id = row.show_id;
@@ -338,13 +335,13 @@ app.get('/rtickets', function(request, response){
 						var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 						conn.query(sql ,[p_id])
 						.on('end', function(res) {
-							var count = res.rowCount;
+							var p_count = res.rowCount;
 
 							// count how many tickets to performance for this email
-							conn.query("SELECT * FROM Attendees WHERE p_id = $1 AND email = $2", [p_id, email])
+							conn.query("SELECT * FROM Attendees AS a, Performances AS p WHERE a.p_id = p.p_id AND a.email = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 							.on('end', function(res) {
 								var count = res.rowCount;
-								var tix = Math.min(2-count, numTix)
+								var tix = Math.min(2-count, numTix - p_count)
 								if(tix > 0) {
 									response.send(tix.toString());
 								}
@@ -508,43 +505,43 @@ function parseDate(str) {
 }
 
 function parse_showtime(showtime) {
-					// 1993-03-17T08%3A30
-					// 0-4 1993
-					// 5 -
-					// 6-7 03
-					// 8 -
-					// 9-10 17
-					// 11-15 T21%3
-					// 16-18 A12
-					var d = new Date();
-					var year = d.getFullYear();
-					var month = showtime.slice(0,2);
-					var day = showtime.slice(2,4);
-					var hour = showtime.slice(4,6);
-					var minutes = showtime.slice(6,8)
-					var am_pm = "AM";
-					/*
-					console.log("yr:  "+year);
-					console.log("mth: "+month);					
-					console.log("day: "+day);
-					console.log("hr:  "+hour);
-					console.log("min: "+minutes);
-					*/
-					months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
-					for (var i = 0; i < months.length; i += 1) {
-						if (months[i].number == month) {
-							month = months[i].month;
-						}
-					}
-					if (hour > 12) {
-						hour = hour-12;
-						am_pm = "PM";
-					}
-					else {
-						hour = hour.slice(1);
-					}
-					var show = (month + " " + day + " at " + hour + ":" + minutes + " " + am_pm); 
-					return show;
-				}
+	// 1993-03-17T08%3A30
+	// 0-4 1993
+	// 5 -
+	// 6-7 03
+	// 8 -
+	// 9-10 17
+	// 11-15 T21%3
+	// 16-18 A12
+	var d = new Date();
+	var year = d.getFullYear();
+	var month = showtime.slice(0,2);
+	var day = showtime.slice(2,4);
+	var hour = showtime.slice(4,6);
+	var minutes = showtime.slice(6,8)
+	var am_pm = "AM";
+	/*
+	console.log("yr:  "+year);
+	console.log("mth: "+month);					
+	console.log("day: "+day);
+	console.log("hr:  "+hour);
+	console.log("min: "+minutes);
+	*/
+	months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
+	for (var i = 0; i < months.length; i += 1) {
+		if (months[i].number == month) {
+			month = months[i].month;
+		}
+	}
+	if (hour > 12) {
+		hour = hour-12;
+		am_pm = "PM";
+	}
+	else {
+		hour = hour.slice(1);
+	}
+	var show = (month + " " + day + " at " + hour + ":" + minutes + " " + am_pm); 
+	return show;
+}
 
 app.listen(8080);
