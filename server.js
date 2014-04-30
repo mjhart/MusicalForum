@@ -314,11 +314,9 @@ app.get('/rtickets', function(request, response){
 	var cur = new Date();
 
 	console.log(date.getTime());
-<<<<<<< HEAD
+
 	console.log("called rtickets");
-=======
-	console.log("called");
->>>>>>> 75b5670493b268576dd5c05f9e6d2ed76bc2a950
+
 	if(date.getTime() > cur.getTime() + 21600000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {

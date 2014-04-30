@@ -17,14 +17,16 @@ function sendInfo(e) {
     if (regex.test(email.toUpperCase()) == false) {
         alert("Please include a valid email address. \n" + email + " is not a valid email address");
     }
-    else {  
+    else { 
+
         var unformatted_date = document.getElementById('date').value;
         var formatted_date = format_date(unformatted_date); 
 
         // specify the type of request, URL, and flag
         var r = request.open('GET','/rtickets?email='+email+'&date='+formatted_date,true);   
-
+console.log("after the request");
         request.addEventListener('load', function(e){
+            console.log("inside the load");
             if (request.status == 200) {
                 console.log("Request status 200");          
                 // do something with loaded content
@@ -40,9 +42,11 @@ function sendInfo(e) {
         // Fill me in!
     }, false);
 
+
+        request.send(null);   
     }
 
-   // request.send(null);   
+   
 }
 
 
