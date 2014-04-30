@@ -19,10 +19,17 @@ function sendInfo(csv_string) {
     fd.append("show_array",document.getElementById('show_array').innerHTML);
     fd.append("csv_string",csv_string);
 	alert(document.getElementById('show_array').innerHTML);
-    // send it to the server
-    var req = new XMLHttpRequest();
-    req.open('POST', '/new_show', true);
-    req.send(fd);
+    var live_date = new Date(document.getElementById('p_live_at').value);
+    var res_date = new Date(document.getElementById('r_live_at').value);
+    if(live_date < res_date){
+        alert("Make sure your live data is after your reserve date! Your request was not submitted");
+    }
+    else{
+        // send it to the server
+        var req = new XMLHttpRequest();
+        req.open('POST', '/new_show', true);
+        req.send(fd);
+    }
 }
 
 function read_file(e) { //read the file
