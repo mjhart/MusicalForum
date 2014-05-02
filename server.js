@@ -121,7 +121,7 @@ app.post('/tickets', function(req, response) {
 							console.log(row);
 							var numTix = row.tickets_alloted;
 
-							console.log("here");
+							console.log("here");old_date
 							// count already reserved tickets for email
 							var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 							conn.query(sql, [email])
@@ -208,9 +208,10 @@ app.post('/tickets', function(req, response) {
 										conn.query(sql2, [p_id, people[i], email]);
 										console.log("inserting");
 									}
+									response.redirect('/show');
 								}
 								else {
-									// show has no tickets left
+									response.redirect('/show');
 								}
 							});
 						});
@@ -269,6 +270,7 @@ app.post('/tickets', function(req, response) {
 														conn.query(sql2, [p_id, people[i], email]);
 														console.log("inserting");
 													}
+													res.redirect('/show');
 												}
 												else {
 													// show has no tickets left
@@ -309,13 +311,13 @@ var csv = require('csv');
 
 //when rendering editshow.html, check if the object passed in is an empty list, if it is populate as if a new show
 
-app.get('/new_show', express.basicAuth('admin', 'admin') ,function(request, response){
+app.get('/new_show', express.basicAuth('admin', 'fullm0nty') ,function(request, response){
 	response.render('setup2.html');
 });
 
 //when editing, the object passed in will be two lists, one with show info and another with performance info
 
-app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, response){
+app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request, response){
 	var title = "";
 	var director = "";
 	var music_director = "";
