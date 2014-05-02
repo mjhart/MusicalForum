@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Musical Forum</title> 
+		<title>Musical Forum CSV Page</title> 
 		<link rel="stylesheet" type="text/css" href="style.css"/> 
 		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
 		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
@@ -33,9 +33,9 @@
 		#accordion {
 			position: absolute;
 			top: 120px;
-			left: 40%;
-			width: 52%;
-			overflow: auto;
+			-left: 40%;
+			width: 90%;
+			-overflow: auto;
 			background-color:rgba(92,64,142,.6);
 			border-top-width: 30px;
 			border-left-width: 30px;
@@ -129,54 +129,20 @@
 					</ul> 
 				</div> 
 			</div>
-			<div id="bar">
-				<form id="showInfo" method="POST" action="/new_show">
-					<input type="text" name="title" id="title" value="{{info.title}}"><br>
-					<input type="text" name="director" id="director" value="{{info.director}}"><br>
-					<input type="text" name="mdirector" id="mdirector" value="{{info.musical_director}}"><br>
-					<textarea id="show_info" name="show_info" value="{{info.show_info}}" style="height: 100px; font-size: 14px; border-color: rgba(0,0,0,0); padding-top: 5px;"></textarea><br>
-					<!-- I do not know how to do the dates with mustache -->
-					<h3> Page goes live </h3>
-					<input type="datetime" name="p_live_at" id="p_live_at" legend="Page goes live at"><br>
-					<h3> Reserves go live </h3>
-					<input type="datetime" name="r_live_at" id="r_live_at" legend="Reserves go live at"><br>
-					<label for="numtotal">Reserve file (.csv)</label>
-	          		<input type="file" name="file_name" id="myFile"> <br>
-					<input type="submit" value="Submit" style="background-color:#FCF;">
-				</form>
-			</div>
+			
 			<div class="cushycms" id="accordion">
-				<h1 id="performances"> Add Performances</h1>
+				<h1 id="performances"> Get Attendee Lists</h1>
 				<ul id="performance_list">
-					<!-- Wendy I'm not exactly sure how to do this, but the set up show up as follows:
-					{{#p}}
-						<li>{{p.date_time}}{{p.tickets}}{{p.reserves}}</li>
-					{{/p}}-->
 					{{#p}}
 					<li>
-						<div class="expandable-panel" id="cp-1"><div class="expandable-panel-heading"><h2><span id="date_time">{{date_time}}</span>, t: <span id="ttix">{{tickets}}</span>, r: <span id="rtix">{{reserves}}</span><button id="cancel_show" class="num{{count}}" onclick="cancel(this)">Cancel</button><a href="csv/{{date_time}}" id="csvload">Save Attendees to CSV (do this first)</a><a href="/csvload/{{date_time}}" id="csvload">Download CSV</a></h2></div></div>
+						<div class="expandable-panel" id="cp-1"><div class="expandable-panel-heading"><h2>{{date_time}}, t: <span id="ttix">{{tickets}}</span>, r: <span id="rtix">{{reserves}}</span><a href="csv/{{date_time}}" id="csvload">Save Attendees to CSV (do this first)</a><a href="/csvload/{{date_time}}" id="csvload">Download CSV</a></h2></div></div>
 					</li>
 					{{/p}}
-				<!--<li>
-				<div class="expandable-panel" id="cp-0"><div class="expandable-panel-heading"><h2>Show, t: <span id="ttix"></span>, r: <span id="rtix"></span><button class="num0" onclick="cancel(this)" id="cancel_show">Cancel</button></h2></div></div>	
-				<li>-->	
 			  	</ul>
 
 
 			  	<div id="show_array" style="visibility:hidden;"></div>
-	        <div id="add-show-form">
-	          <form id="form" method="POST">
-	         	<fieldset>
-	         		<label for="showtime">Show time</label>
-	          		<input type="datetime-local" id="showtime" name="showtime" legend="showtime"> <br>
-	          		<label for="numreserves"># of Reserves</label> 
-	         		<input type="text" name="numreserves" id="numreserves" value="" class="ticket-input"> <br>
-	         		<label for="numtotal"># of Total Tickets</label>
-	          		<input type="text" name="numtotal" id="numtotal" value="" class="ticket-input"> <br>
-	          		<input type="submit" value='Add show' id="add-show"></button>
-	        	</fieldset>
-	       	 </form>
-	        </div>  
+ 
 			</div>
 
 
@@ -240,19 +206,6 @@
 					document.getElementById("show_array").innerHTML = shows;
 					return show;
 				}
-			var ul = document.getElementById("performance_list");
-			var items = ul.getElementsByTagName("li");
-			for(var i=0; i<items.length;i++){
-				var date_time = (items[i].getElementsByTagName('span')[0].innerHTML);
-				var ttix = (items[i].getElementsByTagName('span')[1].innerHTML);
-				var rtix = (items[i].getElementsByTagName('span')[2].innerHTML);
-				shows.push(date_time);
-				shows.push(ttix);
-				shows.push(rtix);
-				document.getElementById("show_array").innerHTML = shows;
-				
-				
-			}
 			var ul = document.getElementById("performance_list");
 			function cancel(obj) {
 				classname = obj.className;
