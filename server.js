@@ -426,6 +426,7 @@ app.get('/attendee/:date', function(request, response){
 		attendees.push(row);
 	});
 	q.on('end', function(){
+		console.log("finished attendees")
 		response.json(attendees);
 	});
 });
@@ -650,7 +651,9 @@ app.get('/csv/:date', function(request, response){
 			
 		})
 		.on('end', function(){
-			response.sendfile(__dirname+'/'+request.params.date+'.csv');
+			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},1000);
+			
+			
 		})
 		.on('error', function(error){
 			console.log(error.message);
