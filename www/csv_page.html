@@ -1,0 +1,273 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Musical Forum CSV Page</title> 
+		<link rel="stylesheet" type="text/css" href="style.css"/> 
+		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
+		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script> 
+		<script type="text/javascript" src="script.js"></script> 
+		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="sendShowInfo.js"></script> 
+		<style>
+		a { text-decoration: none; }
+
+		h1 { position: relative; }
+
+		#csvload {
+			margin-left: 20px;
+			display: block;
+			color: black;
+
+		}
+		#csvload:hover{ color: orange;}
+		#performances { margin-bottom: 10px; }
+		#bar { 
+			text-align: center; 
+			padding: 10px 10px 15px 10px; 
+			background-color: rgba(124,124,124,0.9);
+			width: 35%;
+		}
+		#ShowInfo { position: relative; top: 10px;}	
+		#accordion {
+			position: absolute;
+			top: 120px;
+			-left: 40%;
+			width: 90%;
+			-overflow: auto;
+			background-color:rgba(92,64,142,.6);
+			border-top-width: 30px;
+			border-left-width: 30px;
+			border-right-width: 30px;
+			border-bottom-width: 30px;
+			border-style:solid;
+			border-color:rgba(92,64,142,.0);
+			padding-right: 15px;
+			margin-left: 10px;
+		}
+		#formbox {
+			padding: 5px;
+			width:50%;
+			float:left;
+			height:175px;
+			background-color: rgba(124,124,124,0.9);
+			margin: 5px 5px 10px 0px;
+			text-align: center;
+			font-color: white;
+			position: relative;
+			clear: both;
+			top: 350px;
+			opacity: 1;
+		}
+		select, input, textarea {
+			width: 320px;
+			height: 30px;
+			margin-top: 7px;
+			border-radius: 10px;
+			border-color: 2px solid black;
+			font-size: 18px;
+			padding-left: 10px;
+		}
+		form h3 {
+			text-align: left;
+			font-weight: lighter;
+			margin: 5px 0px -3px 15px;
+		}
+		.ticket-input {
+			width: 30px;
+			height: 20px;
+			font-size: 14px;
+			border-radius: 5px;
+			padding-left: 3px;
+		}
+		#add-show-form form {
+			background-color: rgba(124,124,124,0.9);
+		}
+		#add-show-form fieldset {
+			padding: 5px 20px;
+		}
+		#add-show {
+			padding: 5px 7px;
+			border-radius: 10px;
+			background-color: #fcf;
+			font-size: 14px;
+			width: 100px;
+		}
+		#cancel_show {
+			position: relative;
+			float: right;
+			margin-right: 5px;
+		}
+		</style>
+		
+	</head> 
+	<body> 
+		<div id="navbg"></div>
+		<div id="headerimgs"> 
+			<div id="headerimg1" class="headerimg"></div> 
+			<div id="headerimg2" class="headerimg"></div> 
+		</div>
+		<div id="wholepage">
+			<div id="navbg"></div>
+			<!--grey menu bar-->
+			<div id="header"> 
+				<div id="navigation">
+					<a href="index.php">
+  	 		    		<h1>MUSICAL FORUM</h1>
+  	 		    	</a>
+   	 			</div>
+				<div id="menu"> 
+					<ul> 
+						<li><a href="about.php" > About Us</a> |</li> 
+						<li><a href="board.php">Board Members</a> |</li> 
+						<li><a href="past.php">Past Shows</a>|</li> 
+						<li><a href="show"><font color="#FCF" font="">TICKETS</font></a>|</li> 
+						<li><a href="propose.php" >Propose</a>|</li> 
+						<li><a href="apply.php" >Apply</a>| </li>      
+						<li><a href="calendar.php" >Calendar</a></li>
+					</ul> 
+				</div> 
+			</div>
+			
+			<div class="cushycms" id="accordion">
+				<h1 id="performances"> Get Attendee Lists</h1>
+				<ul id="performance_list">
+					{{#p}}
+					<li>
+						<div class="expandable-panel" id="cp-1"><div class="expandable-panel-heading"><h2>{{date_time}}, t: <span id="ttix">{{tickets}}</span>, r: <span id="rtix">{{reserves}}</span><a href="csv/{{date_time}}" id="csvload">Save Attendees to CSV (do this first)</a><a href="/csvload/{{date_time}}" id="csvload">Download CSV</a></h2></div></div>
+					</li>
+					{{/p}}
+			  	</ul>
+
+
+			  	<div id="show_array" style="visibility:hidden;"></div>
+ 
+			</div>
+
+
+		</div>
+		
+		<script>
+			var shows = Array();
+			var show_date_and_time = "";
+			var button = document.getElementById("add-show");
+	        var form = document.getElementById("form");
+		        form.addEventListener('submit', function (e) {
+         			e.preventDefault(); 
+	            	var showtime = document.getElementById("showtime").value;
+	            	var numreserves = document.getElementById("numreserves").value;
+	            	var numtotal = document.getElementById("numtotal").value;
+	            	show_date_and_time = parse_showtime(showtime,numtotal,numreserves);
+		            var ul = document.getElementById("performance_list");
+		            var li = document.createElement('li');
+		            console.log(ul.children.length);
+		            li.innerHTML = '<div class="expandable-panel" id="cp-'+(ul.children.length)+'">'+'<div class="expandable-panel-heading">'+'<h2>'+show_date_and_time+', t: <span id="ttix">'+numtotal+'</span>, r: <span id="rtix">'+numreserves+'</span><button id="cancel_show" class="num'+(ul.children.length)+'" onclick="cancel(this)">Cancel</button></h2></div></div>';
+					ul.appendChild(li, ul.getElementsByTagName("li"));
+				});		
+					
+				function parse_showtime(showtime,numtotal,numreserves) {
+					// 1993-03-17T08%3A30
+					// 0-4 1993
+					// 5 -
+					// 6-7 03
+					// 8 -
+					// 9-10 17
+					// 11-15 T21%3
+					// 16-18 A12
+					var year = showtime.slice(0,4)
+					var month = showtime.slice(5,7)
+					var day = showtime.slice(8,10)
+					var hour = showtime.slice(11,13)
+					var minutes = showtime.slice(14,16)
+					var am_pm = "AM";
+					console.log("yr:  "+year);
+					console.log("mth: "+month);					
+					console.log("day: "+day);
+					console.log("hr:  "+hour);
+					console.log("min: "+minutes);
+					months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
+					for (var i = 0; i < months.length; i += 1) {
+						if (months[i].number == month) {
+							month = months[i].month;
+						}
+					}
+					if (hour > 12) {
+						hour = hour-12;
+						am_pm = "PM";
+					}
+					else {
+						hour = hour.slice(1);
+					}
+					var show = (month + " " + day + " at " + hour + ":" + minutes + " " + am_pm); 
+					shows.push(show);
+					shows.push(numtotal);
+					shows.push(numreserves);
+					document.getElementById("show_array").innerHTML = shows;
+					return show;
+				}
+			var ul = document.getElementById("performance_list");
+			function cancel(obj) {
+				classname = obj.className;
+				classname = classname.slice(classname.length-1);
+				lis = ul.getElementsByTagName("li");
+				console.log(lis);
+				for (var i=0; i<lis.length; i++) {
+					button = lis[i].getElementsByTagName("button")[0];
+					console.log("button");
+					console.log(button);
+					name = button.className;
+					num = "num"+classname;
+					console.log("name: "+name+"  num: "+num);
+					if (name == num) {
+						ul.removeChild(lis[i]);
+						shows.splice((i*3),3);
+						document.getElementById("show_array").innerHTML = array_to_string(shows);
+						console.log(shows);
+					}
+				}
+			}
+
+			function array_to_string(shows) {
+				show_string = "";
+				var date = "";
+				var tix = "";
+				var rtix = "";
+				var i = 0;
+				for (i=0; i <shows.length; i+=3) {
+					console.log("HELLLO " + i + "    " + shows.length);
+					date = shows[i].toString();
+					tix = shows[i+1].toString();
+					rtix = shows[i+2].toString();
+
+					var date_split = date.split(" ");
+					var month = date_split[0];
+					var month_num = "";
+					months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
+					for (var i = 0; i < months.length; i += 1) {
+						if (months[i].month == month) {
+							month_num = months[i].number;
+						}
+					}
+					var day = date_split[1];
+					var time = date_split[3];
+					var time_split = time.split(":");
+					if (date_split[4] == "PM") {
+						time_split[0] = (parseInt(time_split[0]) + 12).toString();
+					}
+					time = time_split[0] + time_split[1];
+					if (time.length == 3) {
+						time = "0" + time;
+					}
+
+					date = month_num + day + time;
+					console.log(date);
+					console.log(shows);
+					show_string += ("," + date + "," + tix + "," + rtix);
+				}				
+				return console.log(show_string.substring(1));
+			}
+
+        </script>
+	</body>
+</html>

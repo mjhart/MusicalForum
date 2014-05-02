@@ -45,7 +45,7 @@
                 obj.clearQueue();
                 obj.stop();
                 obj.prev().find('.icon-close-open').css('background-position', '0px 0px');
-                obj.animate({'margin-top':(panelheight[objid]*-1)}, panelspeed); 
+                obj.animate({'margin-top':(panelheight[objid]*-3)}, panelspeed);  //not sure if -3 is correct factor
                 if (highlightopen == true) {
                     $('#cp-'+currentpanel + ' .expandable-panel-heading').removeClass('header-active');   
                 }
