@@ -28,7 +28,7 @@ app.get('/tickets.html',function(req,res){
 	res.redirect('/show');
 });
 
-app.post('/tickets', function(req, res) {
+app.post('/tickets', function(req, response) {
 	var email = req.body.email;
 	
 	var old_date = parse_showtime(req.body.date);
