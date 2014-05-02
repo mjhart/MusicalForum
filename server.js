@@ -23,7 +23,7 @@ app.get('/tickets.html',function(req,res){
 	res.redirect('/show');
 });
 
-app.post('/tickets', function(req, res) {
+app.post('/tickets', function(req, response) {
 	var email = req.body.email;
 	
 	var old_date = parse_showtime(req.body.date);
@@ -99,7 +99,7 @@ app.post('/tickets', function(req, res) {
 							console.log(row);
 							var numTix = row.tickets_alloted;
 
-							console.log("here");
+							console.log("here");old_date
 							// count already reserved tickets for email
 							var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 							conn.query(sql, [email])
@@ -186,9 +186,10 @@ app.post('/tickets', function(req, res) {
 										conn.query(sql2, [p_id, people[i], email]);
 										console.log("inserting");
 									}
+									response.redirect('/show');
 								}
 								else {
-									// show has no tickets left
+									response.redirect('/show');
 								}
 							});
 						});
@@ -247,6 +248,7 @@ app.post('/tickets', function(req, res) {
 														conn.query(sql2, [p_id, people[i], email]);
 														console.log("inserting");
 													}
+													res.redirect('/show');
 												}
 												else {
 													// show has no tickets left
