@@ -322,6 +322,7 @@ app.get('/rtickets', function(request, response){
 			.on('row', function(row) {
 				var show = new Date(row.page_live_date);
 				if(cur.getTime() > show.getTime()) { // show is live
+					console.log("in the if");
 
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -352,12 +353,14 @@ app.get('/rtickets', function(request, response){
 					});
 				}
 				else { // show is not live
+
 					console.log("1");
 
 					// check email is reserved
 					var numTix = 0;
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 					.on('row', function(row) {
+
 						numTix = row.tickets_alloted;
 					})
 					.on('end', function(res) {
@@ -399,6 +402,7 @@ app.get('/rtickets', function(request, response){
 													response.send("0");
 												}
 											});
+
 										}
 										else {
 											response.send("0");
