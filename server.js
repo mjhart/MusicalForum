@@ -353,12 +353,15 @@ app.get('/rtickets', function(request, response){
 					});
 				}
 				else { // show is not live
+					console.log("1");
 
 					// check email is reserved
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
-					.on('row', function(row) {
-						var numTix = row.tickets_alloted;
+					.on('end', function(res) {
+						console.log(res);
+						var numTix = res.tickets_alloted;
 
+						console.log("2");
 						// count already reserved tickets for email
 						var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 						conn.query(sql, [email])
@@ -366,6 +369,7 @@ app.get('/rtickets', function(request, response){
 							var reserved = res.rowCount;
 							if(reserved < numTix) {
 
+								console.log("3");
 								// get p_id and reserves of date/time and current show
 								var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
 								conn.query(sql ,[old_date])
@@ -373,10 +377,13 @@ app.get('/rtickets', function(request, response){
 									var p_id = row.p_id;
 									var numRes = row.reserves;
 
+									console.log("4");
 									// count total tickets already reserved for performance
 									var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 									conn.query(sql ,[p_id])
 									.on('end', function(res) {
+
+										console.log("5");
 										var count = res.rowCount;
 										var tix = Math.min(numRes-count-reserved, numTix-reserved)
 										if(tix > 0) {
