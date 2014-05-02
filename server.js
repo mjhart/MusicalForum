@@ -323,6 +323,7 @@ app.get('/rtickets', function(request, response){
 			.on('row', function(row) {
 				var show = new Date(row.page_live_date);
 				if(cur.getTime() > show.getTime()) { // show is live
+					console.log("in the if");
 
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -353,30 +354,31 @@ app.get('/rtickets', function(request, response){
 					});
 				}
 				else { // show is not live
-
+					console.log("in the else");
 					// check email is reserved
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 					.on('row', function(row) {
 						var numTix = row.tickets_alloted;
-
+						console.log("in the else1");
 						// count already reserved tickets for email
 						var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
 						conn.query(sql, [email])
 						.on('end', function(res) {
 							var reserved = res.rowCount;
 							if(reserved < numTix) {
-
+								console.log("in the else2");
 								// get p_id and reserves of date/time and current show
 								var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
 								conn.query(sql ,[old_date])
 								.on('row', function(row) {
 									var p_id = row.p_id;
 									var numRes = row.reserves;
-
+									console.log("in the else3");
 									// count total tickets already reserved for performance
 									var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 									conn.query(sql ,[p_id])
 									.on('end', function(res) {
+										console.log("in the else4");
 										var count = res.rowCount;
 										var tix = Math.min(numRes-count-reserved, numTix-reserved)
 										if(tix > 0) {
