@@ -14,6 +14,11 @@ app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 
+//render staff home page
+app.get('/staff_home_page', express.basicAuth('admin', 'fullm0nty'), function(request, response){
+    response.render('staff_home_page.html');
+});
+
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
@@ -288,13 +293,13 @@ var csv = require('csv');
 
 //when rendering editshow.html, check if the object passed in is an empty list, if it is populate as if a new show
 
-app.get('/new_show', express.basicAuth('admin', 'admin') ,function(request, response){
+app.get('/new_show', express.basicAuth('admin', 'fullm0nty') ,function(request, response){
 	response.render('setup2.html');
 });
 
 //when editing, the object passed in will be two lists, one with show info and another with performance info
 
-app.get('/edit_show', express.basicAuth('admin', 'admin'), function(request, response){
+app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request, response){
 	var title = "";
 	var director = "";
 	var music_director = "";
@@ -428,6 +433,7 @@ app.get('/attendee/:date', function(request, response){
 		attendees.push(row);
 	});
 	q.on('end', function(){
+		console.log("finished attendees")
 		response.json(attendees);
 	});
 });
@@ -649,14 +655,26 @@ app.get('/csv/:date', function(request, response){
 		})
 		.on('close', function(count){
 			console.log('Number of Attendees: ' + count);
+			
+		})
+		.on('end', function(){
+			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},1000);
+			
+			
 		})
 		.on('error', function(error){
 			console.log(error.message);
 		});
+		
+		
 
 	});
+	
+
 
 });
+
+
 
 app.post('/new_show', function(request, response){
 	var title = request.body.title;
