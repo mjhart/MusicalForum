@@ -292,7 +292,7 @@ app.get('/attendee/:date', function(request, response){
 	console.log("attendee called");
 	console.log(request.params.date);
 	var attendees = [];
-	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 ';
+	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
 		console.log(row);
@@ -352,6 +352,7 @@ app.get('/rtickets', function(request, response){
 					});
 				}
 				else { // show is not live
+					console.log("1");
 
 					// check email is reserved
 					var numTix = 0;
