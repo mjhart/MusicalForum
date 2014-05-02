@@ -13,16 +13,21 @@ function sendInfo(csv_string) {
     fd.append("title",document.getElementById('title').value);
     fd.append("director",document.getElementById('director').value);
     fd.append("mdirector",document.getElementById('mdirector').value);  
-    fd.append("show_info",document.getElementById('show_info').value);     
-    fd.append("p_live_at",document.getElementById('p_live_at').value);
-    fd.append("r_live_at",document.getElementById('r_live_at').value);
+    fd.append("show_info",document.getElementById('show_info').value);
+    var tmp_live_date = new Date(document.getElementById('p_live_at').value);
+    var tmp_res_date = new Date(document.getElementById('r_live_at').value);
+    var live_date = new Date(tmp_live_date);     
+    var res_date = new Date(tmp_res_date);
+    live_date.setHours(tmp_live_date.getUTCHours());
+    res_date.setHours(tmp_res_date.getUTCHours());
+    fd.append("p_live_at",live_date.toISOString());
+    fd.append("r_live_at",res_date.toISOString());
     fd.append("show_array",document.getElementById('show_array').innerHTML);
     fd.append("csv_string",csv_string);
 	alert(document.getElementById('show_array').innerHTML);
-    var live_date = new Date(document.getElementById('p_live_at').value);
-    var res_date = new Date(document.getElementById('r_live_at').value);
+    
     if(live_date < res_date){
-        alert("Make sure your live data is after your reserve date! Your request was not submitted");
+        alert("Make sure your live date is after your reserve date! Your request was not submitted");
     }
     else{
         // send it to the server
