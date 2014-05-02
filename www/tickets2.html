@@ -15,9 +15,29 @@
 		<style>
 		a { text-decoration: none; }
 		h1 { position: relative; }
+		.allboxes {
+			display: block;
+			width:310px;
+			margin: 0;
+			padding:0;
+			position:absolute;
+
+		}
 		#performances { margin-bottom: 10px; }
-		#bar { text-align: center; padding: 10px 10px 15px 10px; background-color: rgba(124,124,124,0.9);}
-		#ShowInfo { position: relative; top: 10px;}	
+		#bar { 
+			text-align: center; 
+			padding: 10px 10px 15px 10px; 
+			background-color: rgba(124,124,124,0.9); 
+			margin-bottom:50px; 
+			display:block;
+			position:relative;
+			width:270px;
+			top:72px;
+		}
+		#ShowInfo { 
+			position: relative; 
+			top: 10px; 
+			margin-bottom:15px;}	
 		#accordion {
 			position: absolute;
 			top: 120px;
@@ -37,16 +57,18 @@
 		#formbox {
 			padding: 5px;
 			width:30%;
-			float:left;
+			-float:left;
 			height:175px;
 			background-color: rgba(124,124,124,0.9);
-			margin: -20px 5px 10px 0px;
+			margin: 80px 5px 10px 0px;
 			text-align: center;
 			font-color: white;
 			position: relative;
-			clear: both;
-			top: 350px;
+			-clear: both;
+			-top: 300px;
+			width:300px;
 			opacity: 1;
+			display:block;
 		}
 		select, input{
 			width: 270px;
@@ -86,34 +108,36 @@
 					</ul> 
 				</div> 
 			</div>
-			<div class="cushycms" class="ShowInfoBox" id="bar">
-				<span id="ShowTitle"><font color="#FCF" font="" size="+3">{{info.title}}</font></span>
-				<br />
-				<span id="DirectorInfo">Directed by <span id="DirectorName"> {{info.director}} </span><span id="DirectorYear"></span></span>
-				<br />
-				<span id="MDirectorInfo">Music Directed by <span id="MDirectorName"> {{info.musical_director}} </span><span id="MDirectorYear"></span></span>
-				<br />
-				<span id="ShowInfo"> {{info.show_info}}</span>
-			</div>
-			<div id="formbox">
-				<form id="ticketInfo"> 
-					<input type="text" id="email" name="email" placeholder="E-mail"><br>
-					<select id="date">
-					  <option value="#">Date</option>
-					  {{#p}}
-					  	<option value="{{date_time}}">{{date_time}}</option>
-					  {{/p}}
-					  <!--<option value="February 20 at 8:00 PM">February 20 at 8:00 PM</option>
-					  <option value="February 21 at 8:00 PM">February 21 at 8:00 PM</option>
-					  <option value="February 22 at 2:00 PM">February 22 at 2:00 PM</option>
-					  <option value="February 22 at 8:00 PM">February 22 at 8:00 PM</option>
-					  <option value="February 23 at 8:00 PM">February 23 at 8:00 PM</option>-->
-					</select> <br>
-					<input type="submit" value="Request tickets" style="background-color:#FCF;">
-				</form>
-				<br>
-				<div id="formbox2">
-				</div>			
+			<div class="allboxes">
+				<div class="cushycms" class="ShowInfoBox" id="bar">
+					<span id="ShowTitle"><font color="#FCF" font="" size="+3">{{info.title}}</font></span>
+					<br />
+					<span id="DirectorInfo">Directed by <span id="DirectorName"> {{info.director}} </span></span>
+					<br />
+					<span id="MDirectorInfo">Music Directed by <span id="MDirectorName"> {{info.musical_director}} </span></span>
+					<br />
+					<span id="ShowInfo"> {{info.show_info}}</span>
+				</div>
+				<div id="formbox">
+					<form id="ticketInfo"> 
+						<input type="text" id="email" name="email" placeholder="E-mail"><br>
+						<select id="date">
+						  <option value="#">Date</option>
+						  {{#p}}
+						  	<option value="{{date_time}}">{{date_time}}</option>
+						  {{/p}}
+						  <!--<option value="February 20 at 8:00 PM">February 20 at 8:00 PM</option>
+						  <option value="February 21 at 8:00 PM">February 21 at 8:00 PM</option>
+						  <option value="February 22 at 2:00 PM">February 22 at 2:00 PM</option>
+						  <option value="February 22 at 8:00 PM">February 22 at 8:00 PM</option>
+						  <option value="February 23 at 8:00 PM">February 23 at 8:00 PM</option>-->
+						</select> <br>
+						<input type="submit" value="Request tickets" style="background-color:#FCF;">
+					</form>
+					<br>
+					<div id="formbox2">
+					</div>			
+				</div>
 			</div>
 
 			<div class="cushycms" id="accordion">

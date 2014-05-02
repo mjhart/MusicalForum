@@ -14,7 +14,6 @@ app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 
-
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
@@ -293,7 +292,7 @@ app.get('/attendee/:date', function(request, response){
 	console.log("attendee called");
 	console.log(request.params.date);
 	var attendees = [];
-	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 ';
+	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
 		console.log(row);
@@ -354,46 +353,70 @@ app.get('/rtickets', function(request, response){
 					});
 				}
 				else { // show is not live
-					console.log("in the else");
+
+					console.log("1");
+
 					// check email is reserved
+					var numTix = 0;
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 					.on('row', function(row) {
-						var numTix = row.tickets_alloted;
-						console.log("in the else1");
-						// count already reserved tickets for email
-						var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
-						conn.query(sql, [email])
-						.on('end', function(res) {
-							var reserved = res.rowCount;
-							if(reserved < numTix) {
-								console.log("in the else2");
-								// get p_id and reserves of date/time and current show
-								var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
-								conn.query(sql ,[old_date])
-								.on('row', function(row) {
-									var p_id = row.p_id;
-									var numRes = row.reserves;
-									console.log("in the else3");
-									// count total tickets already reserved for performance
-									var sql = "SELECT * FROM Attendees WHERE p_id = $1";
-									conn.query(sql ,[p_id])
+
+						numTix = row.tickets_alloted;
+					})
+					.on('end', function(res) {
+						console.log("query ended");
+						console.log(res);
+						if(numTix > 0) {
+
+							// count already reserved tickets for email
+							var sql = "SELECT * FROM Attendees WHERE email = $1 AND p_id IN (SELECT p_id FROM Performances WHERE show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1))";
+							conn.query(sql, [email])
+							.on('end', function(res) {
+								var reserved = res.rowCount;
+								if(reserved < numTix) {
+
+									// get p_id and reserves of date/time and current show
+									var found = false;
+									var p_id;
+									var numRes;
+									var sql = "SELECT p_id, reserves FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
+									conn.query(sql ,[old_date])
+									.on('row', function(row) {
+										var p_id = row.p_id;
+										var numRes = row.reserves;
+										found = true;
+									})
 									.on('end', function(res) {
-										console.log("in the else4");
-										var count = res.rowCount;
-										var tix = Math.min(numRes-count-reserved, numTix-reserved)
-										if(tix > 0) {
-											response.send(tix.toString());
+
+										if(found) {
+											// count total tickets already reserved for performance
+											var sql = "SELECT * FROM Attendees WHERE p_id = $1";
+											conn.query(sql ,[p_id])
+											.on('end', function(res) {
+												var count = res.rowCount;
+												var tix = Math.min(numRes-count, numTix-reserved)
+												if(tix > 0) {
+													response.send(tix.toString());
+												}
+												else {
+													response.send("0");
+												}
+											});
+
 										}
 										else {
 											response.send("0");
 										}
 									});
-								});
-							}
-							else {
-								response.send("0");
-							}
-						});
+								}
+								else {
+									response.send("0");
+								}
+							});
+						}
+						else {
+							response.send("0");
+						}
 					});						
 				}
 			});
