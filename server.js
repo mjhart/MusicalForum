@@ -14,6 +14,11 @@ app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 
+//render staff home page
+app.get('/staff_home_page', function(request, response){
+    response.render('staff_home_page.html');
+});
+
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
