@@ -19,9 +19,16 @@
 			margin-left: 20px;
 			display: block;
 			color: black;
-
 		}
 		.important_link:hover{ color: #7ddeff;}
+		.link_descript{
+			color:white;
+			font-size:15px;
+			margin: 10px;
+			margin-left:20px;
+			margin-right: 20px;
+		}
+
 		#performances { margin-bottom: 10px; }
 		#ShowInfo { position: relative; top: 10px;}	
 		#accordion {
@@ -91,8 +98,27 @@
 							<div class="expandable-panel-heading">
 								<h2>
 									<a href="/new_show" class="important_link">Create Show</a>
+									<p class="link_descript">This is the page you will use to create a new show. You can input general show 
+									information, performance times, number of regular and reserve tickets per performance, ticketing page live dates, and a csv reserve list.
+									</p>
+								</h2>
+							</div>
+						</div>
+						<div class="expandable-panel" id="cp-1">
+							<div class="expandable-panel-heading">
+								<h2>
 									<a href="/edit_show" class="important_link">Edit Show</a>
-									<a href="/edit_show" class="important_link">Get Attendee Lists</a>
+									<p class="link_descript">This is the page you will use to edit your current show.
+									</p>
+								</h2>
+							</div>
+						</div>
+						<div class="expandable-panel" id="cp-1">
+							<div class="expandable-panel-heading">
+								<h2>
+									<a href="/csv_page" class="important_link">Get Attendee Lists</a>
+									<p class="link_descript">This is the page you will use to download attendee lists for each of your current show's performances.
+									</p>
 								</h2>
 							</div>
 						</div>
