@@ -321,6 +321,8 @@ app.get('/rtickets', function(request, response){
 			conn.query("SELECT page_live_date FROM ShowInfo WHERE show_id = $1", [id])
 			.on('row', function(row) {
 				var show = new Date(row.page_live_date);
+				console.log(cur);
+				console.log(show);
 				if(cur.getTime() > show.getTime()) { // show is live
 					console.log("in the if");
 
