@@ -25,7 +25,7 @@ function sendInfo(csv_string) {
     fd.append("show_array",document.getElementById('show_array').innerHTML);
     fd.append("csv_string",csv_string);
 	alert(document.getElementById('show_array').innerHTML);
-    
+    alert(live_date);
     if(live_date < res_date){
         alert("Make sure your live date is after your reserve date! Your request was not submitted");
     }
@@ -40,7 +40,8 @@ function sendInfo(csv_string) {
 function read_file(e) { //read the file
     e.preventDefault(); // prevent the page from redirecting
     my_file = document.getElementById("myFile").files[0]; //save file
-    alert("here");
+    
+    alert("IMPORTANT:\nIf any fields are left not filled in, the request to submit your show will not be processed.  If you are seeing this it does not necessary mean it is the case.")
 
     if (window.FileReader) { //file reader is supporter
         get_text(my_file);

@@ -14,6 +14,11 @@ app.use(express.static(__dirname + '/www'));
 
 var date = new Date().toString();
 
+//render staff home page
+app.get('/staff_home_page', function(request, response){
+    response.render('staff_home_page.html');
+});
+
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
@@ -426,6 +431,7 @@ app.get('/attendee/:date', function(request, response){
 		attendees.push(row);
 	});
 	q.on('end', function(){
+		console.log("finished attendees")
 		response.json(attendees);
 	});
 });
@@ -647,14 +653,26 @@ app.get('/csv/:date', function(request, response){
 		})
 		.on('close', function(count){
 			console.log('Number of Attendees: ' + count);
+			
+		})
+		.on('end', function(){
+			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},1000);
+			
+			
 		})
 		.on('error', function(error){
 			console.log(error.message);
 		});
+		
+		
 
 	});
+	
+
 
 });
+
+
 
 app.post('/new_show', function(request, response){
 	var title = request.body.title;
