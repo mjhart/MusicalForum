@@ -430,6 +430,59 @@ app.get('/rtickets', function(request, response){
 	
 });
 
+app.get('/csv_page',function(request,response){
+	var title = "";
+	var director = "";
+	var music_director = "";
+	var show_info = "";
+	var live_date = new Date();
+	var reserve_date = new Date();
+	var showinfo = {};
+	var performances = [];
+	var currshow = -1; 
+	var show_sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
+	var showq = conn.query(show_sql);
+	showq.on('row', function(row){
+		currshow = row.show_id;
+	});
+	showq.on('end',function(){
+		if(currshow != -1){
+			var sql = 'SELECT * FROM ShowInfo WHERE show_id = ' + currshow +';';
+			var q = conn.query(sql);
+			q.on('row', function(row){
+				
+				console.log(row);
+				//var showinfo = {title : row.title, director : row.director, musical_director : row.mdirector, show_info : row.show_info,
+				//	page_live : row.page_live_date, res_live : row.reserve_live_date};
+				showinfo = row;
+
+				console.log("showinfo \n" + showinfo);
+				
+			});
+			q.on('end', function(){
+				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
+				var counter = 0;
+				q1.on('row', function(row){
+					console.log(row);
+					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
+					counter = counter + 1;
+					performances.push(r);
+				});
+				q1.on('end', function(){
+					console.log("at the end");
+					console.log({info : showinfo, p : performances});
+					response.render('csv_page.html', {info : showinfo, p : performances});
+					console.log("told to render");
+				});
+			});
+		}
+		else{
+			response.send("There is no show to edit");
+		}
+	});
+
+
+})
 
 app.get('/csv/:date', function(request, response){
 	
