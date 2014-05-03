@@ -3,10 +3,23 @@
 function sendTInfo(e) {
     // prevent the page from redirecting
     e.preventDefault();
-    // create a FormData object from our form
-    var fd = new FormData();
-    fd.append("email",document.getElementById('email').value);
-    fd.append("date",format_date(document.getElementById('date').value));
+    
+    var form = document.createElement("form");
+    form.setAttribute("method", "POST");
+    form.setAttribute("action", "/tickets");
+
+    var hiddenField = document.createElement("input");
+    hiddenField.setAttribute("type", "hidden");
+    hiddenField.setAttribute("name", "email");
+    hiddenField.setAttribute("value", document.getElementById('email').value);
+    form.appendChild(hiddenField);
+
+    var hiddenField = document.createElement("input");
+    hiddenField.setAttribute("type", "hidden");
+    hiddenField.setAttribute("name", "date");
+    hiddenField.setAttribute("value", format_date(document.getElementById('date').value));
+    form.appendChild(hiddenField);
+
     var inputs = document.getElementsByTagName('input');
     var people = "";
     for (var i=2; i <inputs.length-1; i++) {
@@ -16,14 +29,16 @@ function sendTInfo(e) {
         }
     }
     people = people.substring(1);
-    alert(people);
-    fd.append("people",people);  
 
-    // send it to the server
-    var req = new XMLHttpRequest();
-    req.open('POST', '/tickets', true);
-    req.send(fd);
+    var hiddenField = document.createElement("input");
+    hiddenField.setAttribute("type", "hidden");
+    hiddenField.setAttribute("name", "people");
+    hiddenField.setAttribute("value", people);
+    form.appendChild(hiddenField);
 
+    console.log(form);
+    document.body.appendChild(form);
+    form.submit();
 }
 
 
