@@ -191,7 +191,7 @@ app.post('/tickets', function(req, response) {
 										conn.query(sql2, [p_id, people[i], email]);
 										console.log("inserting");
 									}
-									response.redirect('/show');
+									response.redirect('/new_show');
 								}
 								else {
 									response.redirect('/show');
