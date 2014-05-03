@@ -42,6 +42,9 @@ function sendTInfo(e) {
 }
 
 
+
+
+
 function format_date(date) {    
     console.log("date "+ date);  
     var date_split = date.split(" ");
