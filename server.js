@@ -321,7 +321,7 @@ app.get('/show', function(request, response){
 			});
 		}
 		else{
-			response.send("There is no show in the db");
+			response.redirect("/no_show.html");
 		}
 	});
 
