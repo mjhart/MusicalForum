@@ -19,6 +19,10 @@ app.get('/staff_home_page', express.basicAuth('admin', 'fullm0nty'), function(re
     response.render('staff_home_page.html');
 });
 
+app.get('/show_creation_success', function(request, response){
+    response.render('show_creation_success.html');
+});
+
 app.get('/tickets_sold_out', function(request, response){
     response.render('tickets_sold_out.html');
 });
