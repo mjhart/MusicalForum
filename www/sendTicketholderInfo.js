@@ -23,7 +23,11 @@ function sendTInfo(e) {
     var req = new XMLHttpRequest();
     req.open('POST', '/tickets', true);
     req.send(fd);
+
 }
+
+
+
 
 
 function format_date(date) {    
