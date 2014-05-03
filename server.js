@@ -19,6 +19,23 @@ app.get('/staff_home_page', express.basicAuth('admin', 'fullm0nty'), function(re
     response.render('staff_home_page.html');
 });
 
+app.get('/tickets_sold_out', function(request, response){
+    response.render('tickets_sold_out.html');
+});
+
+app.get('/tickets_error', function(request, response){
+    response.render('tickets_unknown_error.html');
+});
+
+app.get('/tickets_maxed_out', function(request, response){
+    response.render('tickets_maxed_email.html');
+});
+
+app.get('/tickets_success', function(request, response){
+    response.render('tickets_success.html');
+});
+
+
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
@@ -281,6 +298,7 @@ app.post('/tickets', function(req, response) {
 	}
 	else {
 		response.send("0");
+		// too late
 	}
 });
 
