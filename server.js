@@ -208,10 +208,10 @@ app.post('/tickets', function(req, response) {
 										conn.query(sql2, [p_id, people[i], email]);
 										console.log("inserting");
 									}
-									response.redirect('/new_show');
+									response.redirect('/tickets_success.html');
 								}
 								else {
-									response.redirect('/show');
+									response.redirect('/tickets_maxed_email.html');
 								}
 							});
 						});
@@ -270,26 +270,27 @@ app.post('/tickets', function(req, response) {
 														conn.query(sql2, [p_id, people[i], email]);
 														console.log("inserting");
 													}
-													res.redirect('/show');
+													response.redirect('/tickets_success.html');
 												}
 												else {
 													// show has no tickets left
+													response.redirect('/tickets_sold_out.html');
 												}
 											});
 
 										}
 										else {
-											response.send("0");
+											response.redirect('/tickets_unknown_error.html');
 										}
 									});
 								}
 								else {
-									response.send("0");
+									response.redirect('/tickets_maxed_email.html');
 								}
 							});
 						}
 						else {
-							response.send("0");
+							response.redirect('/tickets_sold_out.html');
 						}
 					});						
 				}
@@ -297,14 +298,10 @@ app.post('/tickets', function(req, response) {
 		});
 	}
 	else {
-		response.send("0");
-		// too late
+		response.redirect('/no_show.html');
 	}
 });
 
-app.get('/test', function(req, res) {
-	curShowLive(function(){}, function(){});
-});
 
 var fs = require('fs');
 var csv = require('csv');
