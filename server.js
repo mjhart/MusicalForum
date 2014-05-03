@@ -170,7 +170,7 @@ app.post('/tickets', function(req, response) {
 
 										}
 										else {
-											response.redirect('/tickets_unknown_error.html');
+											response.redirect('/tickets_no_reserve.html');
 										}
 									});
 								}

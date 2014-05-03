@@ -6,6 +6,7 @@ window.addEventListener('load', function(){
 
 
 function sendInfo(csv_string) {
+    console.log("in send info");
     // prevent the page from redirecting
     //e.preventDefault();
     // create a FormData object from our form
@@ -18,15 +19,21 @@ function sendInfo(csv_string) {
     var tmp_res_date = new Date(document.getElementById('r_live_at').value);
     var live_date = new Date(tmp_live_date);     
     var res_date = new Date(tmp_res_date);
-    live_date.setHours(tmp_live_date.getUTCHours());
-    res_date.setHours(tmp_res_date.getUTCHours());
-    var p_live_at = ("p_live_at",live_date.toISOString());
-    var r_live_at = ("r_live_at",res_date.toISOString());
+    try{
+        live_date.setHours(tmp_live_date.getUTCHours());
+        res_date.setHours(tmp_res_date.getUTCHours());
+
+        var p_live_at = ("p_live_at",live_date.toISOString());
+        var r_live_at = ("r_live_at",res_date.toISOString());
+    }
+    catch(error){
+        alert("Make sure to have filled in the dates! Your request was not submitted");
+        return
+    }
     var show_array = ("show_array",document.getElementById('show_array').innerHTML);
     var csv_string = ("csv_string",csv_string);
-	alert(document.getElementById('show_array').innerHTML);
-    alert(live_date);
-    console.log(fd);
+	console.log(p_live_at);
+    
     values = {"title": title, "director": director, "mdirector" : mdirector, "show_info" : show_info,
                "p_live_at" : p_live_at, "r_live_at" : r_live_at, "show_array": show_array, "csv_string" : csv_string };
     
@@ -70,8 +77,8 @@ function post_to_url(path, params) {
 function read_file(e) { //read the file
     e.preventDefault(); // prevent the page from redirecting
     my_file = document.getElementById("myFile").files[0]; //save file
+    console.log("in read file");
     
-    alert("IMPORTANT:\nJust a reminder, if any fields are left not filled in, the request to submit your show will not be processed.")
 
     if (window.FileReader) { //file reader is supporter
         get_text(my_file);
@@ -86,14 +93,21 @@ function get_text(file) {
     file_reader.readAsText(file); // read file into memory as UTF-8   
     file_reader.onload = load_handler;
     file_reader.onerror = error_handler;
+    console.log("in get text");
+    console.log(file);
+    if(file == undefined){
+        alert("You did not input a csv for reserves! Your request was not submitted");
+    }
 }
 
 function load_handler(event) { //if no error occurs
+    console.log("in load handler");
     var csv = event.target.result;
     parse_csv(csv);
 }
 
 function parse_csv(csv) {
+    console.log("parse csv")
     var text = csv.split(/\r\n|\n/);
     var csv_data = [];
     text_length = text.length;
@@ -116,6 +130,7 @@ function parse_csv(csv) {
 }
 
 function error_handler(evt) { //in case of error
+    alert("ERROR");
     if(evt.target.error.name == "NotReadableError") {
         alert("ERROR: cannot read this file");
     }
