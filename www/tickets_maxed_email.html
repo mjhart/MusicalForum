@@ -4,65 +4,13 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Musical Forum: Failure</title> 
 		<link rel="stylesheet" type="text/css" href="style.css"/> 
+		<link rel="stylesheet" type="text/css" href="tickets_staff_csv.css"/> 
 		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
 		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script> 
 		<script type="text/javascript" src="script.js"></script> 
 		<script type="text/javascript" src="jquery.js"></script>
 		<script type="text/javascript" src="sendShowInfo.js"></script> 
-		<style>
-		a { text-decoration: none; }
-
-		h1 { position: relative; }
-		#success{
-			font-size:25px;
-			margin-left:20px;
-			margin-top:5px;
-			color:white;
-		}
-		#performance_list{
-			list-style-type: none;
-		}
-		.descriptions{
-			color:white;
-			font-size:15px;
-			margin: 10px;
-			margin-left:20px;
-			margin-right: 20px;
-		}
-
-		#performances { margin-bottom: 10px; }
-		#ShowInfo { position: relative; top: 10px;}	
-		#accordion {
-			position: absolute;
-			top: 120px;
-			width: 90%;
-			background-color:rgba(92,64,142,.6);
-			border-top-width: 30px;
-			border-left-width: 30px;
-			border-right-width: 30px;
-			border-bottom-width: 30px;
-			border-style:solid;
-			border-color:rgba(92,64,142,.0);
-			padding-right: 15px;
-			margin-left: 10px;
-		}
-		select, input, textarea {
-			width: 320px;
-			height: 30px;
-			margin-top: 7px;
-			border-radius: 10px;
-			border-color: 2px solid black;
-			font-size: 18px;
-			padding-left: 10px;
-		}
-		form h3 {
-			text-align: left;
-			font-weight: lighter;
-			margin: 5px 0px -3px 15px;
-		}
-		</style>
-		
 	</head> 
 	<body> 
 		<div id="navbg"></div>
@@ -93,13 +41,13 @@
 			</div>
 			
 			<div class="cushycms" id="accordion">
-				<h1 id="performances"> </h1>
-				<ul id="performance_list">
+				<h1 id="ticket_result"> </h1>
+				<ul id="ticket_result_list">
 					<li>
-						<div class="expandable-panel" id="cp-1">
-							<div class="expandable-panel-heading">
+						<div class="list-container" id="cp-1">
+							<div class="list-container-heading">
 								<h2>
-									<p id="success">Oh no!</p>
+									<p id="big-descript">Oh no!</p>
 									<p class="descriptions">It seems that you have already reserved the maximum number of tickets available to this email. Visit the <a href="/show">TICKETS</a> page if you want to use a different email. 
 									</p>
 								</h2>

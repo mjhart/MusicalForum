@@ -4,58 +4,13 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 		<title>Musical Forum CSV Page</title> 
 		<link rel="stylesheet" type="text/css" href="style.css"/> 
+		<link rel="stylesheet" type="text/css" href="tickets_staff_csv.css"/> 
 		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
 		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script> 
 		<script type="text/javascript" src="script.js"></script> 
 		<script type="text/javascript" src="jquery.js"></script>
 		<script type="text/javascript" src="sendShowInfo.js"></script> 
-		<style>
-		a { text-decoration: none; }
-
-		h1 { position: relative; }
-		#performance_list{
-			list-style-type: none;
-		}
-		#csvload {
-			margin-left: 20px;
-			display: block;
-			color: black;
-			margin-top:3px;
-		}
-		#csvload:hover{ color: #7ddeff;}
-		#performances { margin-bottom: 10px; }
-		#ShowInfo { position: relative; top: 10px;}	
-		#accordion {
-			position: absolute;
-			top: 120px;
-			width: 90%;
-			background-color:rgba(92,64,142,.6);
-			border-top-width: 30px;
-			border-left-width: 30px;
-			border-right-width: 30px;
-			border-bottom-width: 30px;
-			border-style:solid;
-			border-color:rgba(92,64,142,.0);
-			padding-right: 15px;
-			margin-left: 10px;
-		}
-		select, input, textarea {
-			width: 320px;
-			height: 30px;
-			margin-top: 7px;
-			border-radius: 10px;
-			border-color: 2px solid black;
-			font-size: 18px;
-			padding-left: 10px;
-		}
-		form h3 {
-			text-align: left;
-			font-weight: lighter;
-			margin: 5px 0px -3px 15px;
-		}
-		</style>
-		
 	</head> 
 	<body> 
 		<div id="navbg"></div>
@@ -86,23 +41,24 @@
 			</div>
 			
 			<div class="cushycms" id="accordion">
-				<h1 id="performances"> Get Attendee Lists</h1>
-				<ul id="performance_list">
+				<h1 id="guide"> Get Attendee Lists</h1>
+				<ul id="guide-list">
 					{{#p}}
 					<li>
-						<div class="expandable-panel" id="cp-1"><div class="expandable-panel-heading"><h2>{{date_time}}, total tickets: <span id="ttix">{{tickets}}</span>, reserves: <span id="rtix">{{reserves}}</span><a href="csv/{{date_time}}" id="csvload">Download Attendee List</a></h2></div></div>
+						<div class="expandable-panel" id="cp-1">
+							<div class="expandable-panel-heading">
+								<h2>{{date_time}}, total tickets: <span id="ttix">{{tickets}}</span>, reserves: <span id="rtix">{{reserves}}</span>
+									<a href="csv/{{date_time}}" id="csvload">Download Attendee List</a>
+								</h2>
+							</div>
+						</div>
 					</li>
 					{{/p}}
 			  	</ul>
-
-
 			  	<div id="show_array" style="visibility:hidden;"></div>
- 
 			</div>
-
-
 		</div>
-		
+	
 		<script>
 			var shows = Array();
 			var show_date_and_time = "";
