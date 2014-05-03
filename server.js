@@ -213,11 +213,16 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 	var reserve_date = new Date();
 	var showinfo = {};
 	var performances = [];
-	var currshow = -1; 
+	var currshow = -1;
+	d = new Date(); 
 	var show_sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
 	var showq = conn.query(show_sql);
 	showq.on('row', function(row){
-		currshow = row.show_id;
+		var liveDate = new Date(row.reserve_live_date);
+		if(liveDate.getTime() > d.getTime()){
+			currshow = row.show_id;
+		}
+		
 	});
 	showq.on('end',function(){
 		if(currshow != -1){
@@ -251,7 +256,7 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 			});
 		}
 		else{
-			response.send("There is no show to edit");
+			response.redirect("/show_edit_late");
 		}
 	});
 });
