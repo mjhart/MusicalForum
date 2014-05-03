@@ -1,0 +1,69 @@
+@charset "UTF-8";
+/* CSS Document */
+
+a { text-decoration: none; }
+h1 { position: relative; }
+.allboxes {
+	display: block;
+	width:310px;
+	margin: 0;
+	padding:0;
+	position:absolute;
+
+}
+#performances { margin-bottom: 10px; }
+#bar { 
+	text-align: center; 
+	padding: 10px 10px 15px 10px; 
+	background-color: rgba(124,124,124,0.9); 
+	margin-bottom:50px; 
+	display:block;
+	position:relative;
+	width:270px;
+	top:72px;
+}
+#ShowInfo { 
+	position: relative; 
+	top: 10px; 
+	margin-bottom:15px;}	
+#accordion {
+	position: absolute;
+	top: 120px;
+	left: 31%;
+	width: 61%;
+	overflow: auto;
+	background-color:rgba(92,64,142,.6);
+	border-top-width: 30px;
+	border-left-width: 30px;
+	border-right-width: 30px;
+	border-bottom-width: 30px;
+	border-style:solid;
+	border-color:rgba(92,64,142,.0);
+	padding-right: 15px;
+	margin-left: 10px;
+}
+#formbox {
+	padding: 5px;
+	width:30%;
+	-float:left;
+	height:175px;
+	background-color: rgba(124,124,124,0.9);
+	margin: 80px 5px 10px 0px;
+	text-align: center;
+	font-color: white;
+	position: relative;
+	-clear: both;
+	-top: 300px;
+	width:300px;
+	opacity: 1;
+	display:block;
+}
+select, input{
+	width: 270px;
+	height: 25px;
+	margin-top: 7px;
+	border-radius: 10px;
+	border-color: 2px solid black;
+	font-size: 14px;
+	padding-left: 10px;
+}
