@@ -58,18 +58,13 @@
 			<div class="cushycms" id="accordion">
 				<h1 id="performances"> Add Performances</h1>
 				<ul id="performance_list">
-					<!-- Wendy I'm not exactly sure how to do this, but the set up show up as follows:
-					{{#p}}
-						<li>{{p.date_time}}{{p.tickets}}{{p.reserves}}</li>
-					{{/p}}-->
+
 					{{#p}}
 					<li>
 						<div class="expandable-panel" id="cp-1"><div class="expandable-panel-heading"><h2><span id="date_time">{{date_time}}</span>, tickets: <span id="ttix">{{tickets}}</span>, reserves: <span id="rtix">{{reserves}}</span><button id="cancel_show" class="num{{count}}" onclick="cancel(this)">Cancel</button></h2></div></div>
 					</li>
 					{{/p}}
-				<!--<li>
-				<div class="expandable-panel" id="cp-0"><div class="expandable-panel-heading"><h2>Show, t: <span id="ttix"></span>, r: <span id="rtix"></span><button class="num0" onclick="cancel(this)" id="cancel_show">Cancel</button></h2></div></div>	
-				<li>-->	
+
 			  	</ul>
 			  	<div id="show_array" style="visibility:hidden;"></div>
 	        <div id="add-show-form">
@@ -107,14 +102,7 @@
 				});		
 					
 				function parse_showtime(showtime,numtotal,numreserves) {
-					// 1993-03-17T08%3A30
-					// 0-4 1993
-					// 5 -
-					// 6-7 03
-					// 8 -
-					// 9-10 17
-					// 11-15 T21%3
-					// 16-18 A12
+
 					var year = showtime.slice(0,4)
 					var month = showtime.slice(5,7)
 					var day = showtime.slice(8,10)

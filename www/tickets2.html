@@ -8,7 +8,6 @@
 		<link rel="stylesheet" type="text/css" href="collapsable_css.css"/> 		
 		<link href='http://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>	
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script> 
-		<!--<script type="text/javascript" src="script.js"></script> -->
 		<script type="text/javascript" src="getAttendees.js"></script> 
 		<script type="text/javascript" src="jquery.js"></script> 
 		<script type="text/javascript" src="sendTicketRequest.js"></script> 	
@@ -59,11 +58,7 @@
 						  {{#p}}
 						  	<option value="{{date_time}}">{{date_time}}</option>
 						  {{/p}}
-						  <!--<option value="February 20 at 8:00 PM">February 20 at 8:00 PM</option>
-						  <option value="February 21 at 8:00 PM">February 21 at 8:00 PM</option>
-						  <option value="February 22 at 2:00 PM">February 22 at 2:00 PM</option>
-						  <option value="February 22 at 8:00 PM">February 22 at 8:00 PM</option>
-						  <option value="February 23 at 8:00 PM">February 23 at 8:00 PM</option>-->
+
 						</select> <br>
 						<input type="submit" value="Request tickets" style="background-color:#FCF;">
 					</form>
@@ -85,44 +80,7 @@
 			         <p> <h4> Who's Attending? </h4> <span id="attendees_{{date_time}}"> </span> </p>
 			     </div>
 			  </div> 
-			  {{/p}}
-			     
-			    <!-- <div class="expandable-panel" id="cp-2">
-			     <div class="expandable-panel-heading">
-			         <h2 id="datemmddtttt">February 21 at 8:00 PM</h2>
-			     </div>
-			     <div class="expandable-panel-content">
-			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
-			     </div>
-			    </div> 
-
-			  <div class="expandable-panel" id="cp-3">
-			     <div class="expandable-panel-heading">
-			         <h2 id="datemmddtttt">February 22 at 2:00 PM</h2>
-			     </div>
-			     <div class="expandable-panel-content">
-			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
-			     </div>
-			  </div> 
-
-			  <div class="expandable-panel" id="cp-4">
-			     <div class="expandable-panel-heading">
-			         <h2 id="datemmddtttt">February 22 at 8:00 PM</h2>
-			     </div>
-			     <div class="expandable-panel-content">
-			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
-			     </div>
-			  </div> 
-
-			  <div class="expandable-panel" id="cp-5">
-			     <div class="expandable-panel-heading">
-			         <h2 id="datemmddtttt">February 23 at 8:00 PM</h2>
-			     </div>
-			     <div class="expandable-panel-content">
-			         <p> <h4> Who's Attending? </h4> <span id="attendees_mmddtttt">Wendy Ginsberg, Tess Druckenmiller, Jerome DeNijs, Matt Hart </span> </p>
-			     </div>
-			  </div>  -->		  			 
-			
+			  {{/p}}		     		 		
 			</div>
 		</div>
 	</body>
