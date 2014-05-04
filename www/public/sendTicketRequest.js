@@ -11,8 +11,7 @@ function sendInfo(e) {
     // create a request
     var request = new XMLHttpRequest();
 
-    var email = document.getElementById('email').value;
-    console.log(email);        
+    var email = document.getElementById('email').value;       
     var regex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/;   
     if (regex.test(email.toUpperCase()) == false) {
         alert("Please include a valid email address. \n" + email + " is not a valid email address");
@@ -24,11 +23,8 @@ function sendInfo(e) {
 
         // specify the type of request, URL, and flag
         var r = request.open('GET','/rtickets?email='+email+'&date='+formatted_date,true);   
-console.log("after the request");
         request.addEventListener('load', function(e){
-            console.log("inside the load");
-            if (request.status == 200) {
-                console.log("Request status 200");          
+            if (request.status == 200) {         
                 // do something with loaded content
                 var num_tickets = request.responseText;
                 post_form(unformatted_date, parseInt(num_tickets));   
