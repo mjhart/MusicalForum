@@ -1,15 +1,10 @@
 window.addEventListener('load', function(){
     var showInfo = document.getElementById('showInfo');
     showInfo.addEventListener('submit', read_file, false);
-    console.log("HELLO");
 }, false);
 
 
 function sendInfo(csv_string) {
-    console.log("in send info");
-    // prevent the page from redirecting
-    //e.preventDefault();
-    // create a FormData object from our form
     var fd = new FormData();
     var title = ("title",document.getElementById('title').value);
     var director = ("director",document.getElementById('director').value);
@@ -32,7 +27,6 @@ function sendInfo(csv_string) {
     }
     var show_array = ("show_array",document.getElementById('show_array').innerHTML);
     var csv_string = ("csv_string",csv_string);
-	console.log(p_live_at);
     
     values = {"title": title, "director": director, "mdirector" : mdirector, "show_info" : show_info,
                "p_live_at" : p_live_at, "r_live_at" : r_live_at, "show_array": show_array, "csv_string" : csv_string };
@@ -42,11 +36,6 @@ function sendInfo(csv_string) {
     }
     else{
         post_to_url('new_show', values);
-        // send it to the server
-        /*var req = new XMLHttpRequest();
-        req.open('POST', '/new_show', true);
-        req.send(fd);*/
-
     }
 }
 
@@ -76,9 +65,7 @@ function post_to_url(path, params) {
 
 function read_file(e) { //read the file
     e.preventDefault(); // prevent the page from redirecting
-    my_file = document.getElementById("myFile").files[0]; //save file
-    console.log("in read file");
-    
+    my_file = document.getElementById("myFile").files[0]; //save file   
 
     if (window.FileReader) { //file reader is supporter
         get_text(my_file);
@@ -93,21 +80,17 @@ function get_text(file) {
     file_reader.readAsText(file); // read file into memory as UTF-8   
     file_reader.onload = load_handler;
     file_reader.onerror = error_handler;
-    console.log("in get text");
-    console.log(file);
     if(file == undefined){
         alert("You did not input a csv for reserves! Your request was not submitted");
     }
 }
 
 function load_handler(event) { //if no error occurs
-    console.log("in load handler");
     var csv = event.target.result;
     parse_csv(csv);
 }
 
 function parse_csv(csv) {
-    console.log("parse csv")
     var text = csv.split(/\r\n|\n/);
     var csv_data = [];
     text_length = text.length;
@@ -122,7 +105,6 @@ function parse_csv(csv) {
         csv_data.push(text_array);
         i=i+1;
     }
-    console.log("csv_data="+csv_data);
     var csv_string = csv_data.toString();
     sendInfo(csv_string);
 

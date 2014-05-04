@@ -42,7 +42,6 @@ function sendTInfo(e) {
             hiddenField.setAttribute("value", people);
             form.appendChild(hiddenField);
 
-            console.log(form);
             document.body.appendChild(form);
             form.submit();
         }
@@ -53,8 +52,7 @@ function sendTInfo(e) {
 
 
 
-function format_date(date) {    
-    console.log("date "+ date);  
+function format_date(date) {     
     var date_split = date.split(" ");
     var month = date_split[0];
     var month_num = "";
@@ -75,7 +73,6 @@ function format_date(date) {
         time = "0" + time;
     }
 
-    date = month_num + day + time;  
-    console.log("date "+ date);  
+    date = month_num + day + time;   
     return date;  
 }

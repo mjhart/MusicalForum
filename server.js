@@ -222,10 +222,14 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 	var performances = [];
 	var currshow = -1;
 	d = new Date(); 
-	var show_sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
+	var show_sql = 'SELECT show_id , reserve_live_date FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
 	var showq = conn.query(show_sql);
 	showq.on('row', function(row){
+		console.log(row.reserve_live_date);
 		var liveDate = new Date(row.reserve_live_date);
+		console.log(liveDate.getTime());
+		console.log(liveDate);
+		console.log(d.getTime());
 		if(liveDate.getTime() > d.getTime()){
 			currshow = row.show_id;
 		}
@@ -575,7 +579,7 @@ app.get('/csv/:date', function(request, response){
 			
 		})
 		.on('end', function(){
-			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},1000);
+			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},2000);
 			
 			
 		})
@@ -604,6 +608,8 @@ app.post('/new_show', function(request, response){
 	var csv_string = request.body.csv_string;
 	var live_date = new Date(page_live);
 	var res_date = new Date(reserve_live);
+	console.log(page_live);
+	console.log(reserve_live);
 	if(live_date.getTime() < res_date.getTime()){
 		response.send("ERROR: live date must be after reserve date");
 	}
