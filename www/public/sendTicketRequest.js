@@ -111,12 +111,22 @@ function post_form(date,num_tickets) {
         input.setAttribute('placeholder','Full Name of Ticketholder '+num.toString());  
         form.appendChild(input);      
     } 
-    var s = document.createElement("input"); //input element, Submit button
-    s.setAttribute('type',"submit");
-    s.setAttribute('value',"Submit");  
-    s.setAttribute('id','ticketholderInfo');
-    s.style.backgroundColor = "#fcf";
-    form.appendChild(s);  
+    if(num_tickets != 0) {
+        var s = document.createElement("input"); //input element, Submit button
+        s.setAttribute('type',"submit");
+        s.setAttribute('value',"Submit");  
+        s.setAttribute('id','ticketholderInfo');
+        s.style.backgroundColor = "#fcf";
+        form.appendChild(s);
+    }
+    else {
+        var s = document.createElement("input"); //input element, Submit button
+        s.setAttribute('type',"submit");
+        s.setAttribute('value',"Why?");  
+        s.setAttribute('id','ticketholderInfo');
+        s.style.backgroundColor = "#fcf";
+        form.appendChild(s);
+    }
 
     var ticketForm = document.getElementById('ticketForm');
     ticketForm.addEventListener('submit', sendTInfo, false);
