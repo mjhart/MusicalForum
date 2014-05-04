@@ -10,7 +10,7 @@ var engines = require('consolidate');
 app.engine('html', engines.hogan); // tell Express to run .html files through Hogan
 app.set('views', __dirname + '/www'); // tell Express where to find templates
 
-app.use(express.static(__dirname + '/www'));
+app.use(express.static(__dirname + '/www/public'));
 
 var date = new Date().toString();
 
