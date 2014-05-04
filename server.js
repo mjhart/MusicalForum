@@ -260,7 +260,7 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 			});
 		}
 		else{
-			response.redirect("/show_edit_late");
+			response.redirect("/show_edit_late.html");
 		}
 	});
 });
@@ -572,7 +572,7 @@ app.get('/csv/:date', function(request, response){
 			
 		})
 		.on('end', function(){
-			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},1000);
+			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},2000);
 			
 			
 		})
