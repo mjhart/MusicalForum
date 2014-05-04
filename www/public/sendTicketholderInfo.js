@@ -22,23 +22,31 @@ function sendTInfo(e) {
 
     var inputs = document.getElementsByTagName('input');
     var people = "";
-    for (var i=2; i <inputs.length-1; i++) {
-        if(inputs[i].value.length != 0) {
-            people += ","        
-            people += inputs[i].value;
+    if(inputs.length > 3) {
+        var first = true;
+        for (var i=2; i <inputs.length-1; i++) {
+            if(inputs[i].value.length != 0) {
+                if(first) {
+                    first = false;
+                }
+                else {
+                    people += ","
+                }      
+                people += inputs[i].value;
+            }
+        }
+        if(people.length > 0) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", "people");
+            hiddenField.setAttribute("value", people);
+            form.appendChild(hiddenField);
+
+            console.log(form);
+            document.body.appendChild(form);
+            form.submit();
         }
     }
-    people = people.substring(1);
-
-    var hiddenField = document.createElement("input");
-    hiddenField.setAttribute("type", "hidden");
-    hiddenField.setAttribute("name", "people");
-    hiddenField.setAttribute("value", people);
-    form.appendChild(hiddenField);
-
-    console.log(form);
-    document.body.appendChild(form);
-    form.submit();
 }
 
 

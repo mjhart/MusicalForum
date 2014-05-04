@@ -263,13 +263,12 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 			});
 		}
 		else{
-			response.redirect("/show_edit_late");
+			response.redirect("/show_edit_late.html");
 		}
 	});
 });
 
 app.get('/show', function(request, response){
-
 	var performances = [];
 	currshow = -1;
 	lasttime = 0;
@@ -277,6 +276,7 @@ app.get('/show', function(request, response){
 	var show_sql = 'SELECT show_id, reserve_live_date FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
 	var showq = conn.query(show_sql);
 	var showinfo = {};
+
 	showq.on('row', function(row){
 		var liveDate = new Date(row.reserve_live_date);
 		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
