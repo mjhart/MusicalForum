@@ -13,16 +13,14 @@
           
         //Initialise collapsible panels
         function panelinit() {
-            console.log("panels");
-                for (var i=1; i<=totalpanels; i++) {
-                    console.log(totalpanels);
-                    panelheight[i] = parseInt($('#cp-'+i).find('.expandable-panel-content').css('height'));
-                    $('#cp-'+i).find('.expandable-panel-content').css('margin-top', -panelheight[i]);
-                    if (defaultopenpanel == i) {
-                        $('#cp-'+i).find('.icon-close-open').css('background-position', '0px -'+iconheight+'px');
-                        $('#cp-'+i).find('.expandable-panel-content').css('margin-top', 0);
-                    }
+            for (var i=1; i<=totalpanels; i++) {
+                panelheight[i] = parseInt($('#cp-'+i).find('.expandable-panel-content').css('height'));
+                $('#cp-'+i).find('.expandable-panel-content').css('margin-top', -panelheight[i]);
+                if (defaultopenpanel == i) {
+                    $('#cp-'+i).find('.icon-close-open').css('background-position', '0px -'+iconheight+'px');
+                    $('#cp-'+i).find('.expandable-panel-content').css('margin-top', 0);
                 }
+            }
         }
   
         $('.expandable-panel-heading').click(function() {           
