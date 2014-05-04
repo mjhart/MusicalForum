@@ -91,8 +91,11 @@ app.post('/tickets', function(req, response) {
 							conn.query("SELECT * FROM Attendees AS a, Performances AS p WHERE a.p_id = p.p_id AND a.email = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
 							.on('end', function(res) {
 								var count = res.rowCount;
-								var tix = Math.min(2-count, numTix - p_count)
-								if(people.length <= tix) {
+								var tix = Math.min(2-count, numTix - p_count);
+								if(numTix - p_count <= 0) {
+									response.redirect('/tickets_sold_out.html');
+								}
+								else if(people.length <= tix) {
 									for(var i=0; i<people.length; i++) {
 										var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
 										conn.query(sql2, [p_id, people[i], email]);
@@ -180,7 +183,7 @@ app.post('/tickets', function(req, response) {
 							});
 						}
 						else {
-							response.redirect('/tickets_sold_out.html');
+							response.redirect('/tickets_no_reserve.html');
 						}
 					});						
 				}
