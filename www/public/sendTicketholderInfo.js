@@ -46,6 +46,16 @@ function sendTInfo(e) {
             form.submit();
         }
     }
+    else {
+        var hiddenField = document.createElement("input");
+        hiddenField.setAttribute("type", "hidden");
+        hiddenField.setAttribute("name", "people");
+        hiddenField.setAttribute("value", people);
+        form.appendChild(hiddenField);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
 }
 
 
