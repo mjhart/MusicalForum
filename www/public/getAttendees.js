@@ -7,7 +7,6 @@ window.addEventListener('load', function(){
 
     var today = new Date();
     var date = event.target.id;
-    console.log(date);
     // specify the type of request, URL, and flag
     var r = request.open('GET', '/attendee/' + date,true);
 
@@ -32,8 +31,6 @@ window.addEventListener('load', function(){
                 attendees += showGoers[i].toString()+', ';
 
             }
-            console.log(attendees);
-            // The id will be datemmddtttt
             
             // Get the substring so it is mmddtttt
             //date = date.substring(4);
