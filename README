@@ -1,0 +1,27 @@
+README
+
+authors: mjhart, tdrucken, wginsber, jadenijs
+
+To run the server, run a node server with the javascript file server.js. Then to
+create a show, log in to the staff home page at /staff_home_page. This page
+includes links to pages for creating a show, editing a show, and downloading 
+attendee lists. You can only edit a show before the reserve period goes live. 
+
+Staff Pages
+===========
+
+* /staff_home_page - A landing page for all staff functions
+
+* /new_show - Used for creating a new show. We have provided a small example 
+csv file, which can be used to test. 
+
+* /edit_show - Edits the most recently created show. Cannot be accessed if this 
+show has already entered the reserve period.
+
+* /csv_page - Can be used to download csv file of attendees.
+
+User Pages
+==========
+
+* /show - Allows users to see who is attending a show and reserve tickets.
+

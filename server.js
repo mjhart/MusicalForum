@@ -47,19 +47,12 @@ app.get('/tickets_success', function(request, response){
 app.get('/csvload/:date_time', function(req, res){
 	res.sendfile(__dirname+'/'+req.params.date_time+'.csv');
 });
-// submit ticket request
-
-app.get('/tickets.html',function(req,res){
-	res.redirect('/show');
-});
 
 app.post('/tickets', function(req, response) {
 	var email = req.body.email;
 	
 	var old_date = parse_showtime(req.body.date);
-	console.log(old_date);
 	var date = parseDate(req.body.date);
-	console.log(date.getTime());
 	var people = req.body.people.split(",");
 
 	var cur = new Date();
@@ -73,10 +66,7 @@ app.post('/tickets', function(req, response) {
 			conn.query("SELECT page_live_date FROM ShowInfo WHERE show_id = $1", [id])
 			.on('row', function(row) {
 				var show = new Date(row.page_live_date);
-				console.log(cur);
-				console.log(show);
 				if(cur.getTime() > show.getTime()) { // show is live
-					console.log("in the if");
 
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -103,7 +93,6 @@ app.post('/tickets', function(req, response) {
 									for(var i=0; i<people.length; i++) {
 										var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
 										conn.query(sql2, [p_id, people[i], email]);
-										console.log("inserting");
 									}
 									response.redirect('/tickets_success.html');
 								}
@@ -116,8 +105,6 @@ app.post('/tickets', function(req, response) {
 				}
 				else { // show is not live
 
-					console.log("1");
-
 					// check email is reserved
 					var numTix = 0;
 					conn.query("SELECT tickets_alloted FROM Reserves WHERE email = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)", [email])
@@ -126,9 +113,6 @@ app.post('/tickets', function(req, response) {
 						numTix = row.tickets_alloted;
 					})
 					.on('end', function(res) {
-						console.log("query ended");
-						console.log(res);
-						console.log(numTix);
 						if(numTix > 0) {
 
 							// count already reserved tickets for email
@@ -152,20 +136,16 @@ app.post('/tickets', function(req, response) {
 									.on('end', function(res) {
 
 										if(found) {
-											console.log("here");
 											// count total tickets already reserved for performance
 											var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 											conn.query(sql ,[p_id])
 											.on('end', function(res) {
 												var count = res.rowCount;
-												console.log(count);
-												console.log(numRes);
 												var tix = Math.min(numRes-count, numTix-reserved)
 												if(people.length <= tix) {
 													for(var i=0; i<people.length; i++) {
 														var sql2 = "INSERT INTO Attendees VALUES($1, $2, $3)";
 														conn.query(sql2, [p_id, people[i], email]);
-														console.log("inserting");
 													}
 													response.redirect('/tickets_success.html');
 												}
@@ -225,11 +205,7 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 	var show_sql = 'SELECT show_id , reserve_live_date FROM ShowInfo ORDER BY show_id DESC LIMIT 1'
 	var showq = conn.query(show_sql);
 	showq.on('row', function(row){
-		console.log(row.reserve_live_date);
 		var liveDate = new Date(row.reserve_live_date);
-		console.log(liveDate.getTime());
-		console.log(liveDate);
-		console.log(d.getTime());
 		if(liveDate.getTime() > d.getTime()){
 			currshow = row.show_id;
 		}
@@ -241,28 +217,21 @@ app.get('/edit_show', express.basicAuth('admin', 'fullm0nty'), function(request,
 			var q = conn.query(sql);
 			q.on('row', function(row){
 				
-				console.log(row);
 				//var showinfo = {title : row.title, director : row.director, musical_director : row.mdirector, show_info : row.show_info,
 				//	page_live : row.page_live_date, res_live : row.reserve_live_date};
 				showinfo = row;
-
-				console.log("showinfo \n" + showinfo);
 				
 			});
 			q.on('end', function(){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
 				var counter = 0;
 				q1.on('row', function(row){
-					console.log(row);
 					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
 					counter = counter + 1;
 					performances.push(r);
 				});
 				q1.on('end', function(){
-					console.log("at the end");
-					console.log({info : showinfo, p : performances});
 					response.render('setup3.html', {info : showinfo, p : performances});
-					console.log("told to render");
 				});
 			});
 		}
@@ -284,7 +253,6 @@ app.get('/show', function(request, response){
 	showq.on('row', function(row){
 		var liveDate = new Date(row.reserve_live_date);
 		if(liveDate.getTime() < d.getTime() && liveDate.getTime() > lasttime){
-			console.log(row.show_id);
 			currshow = row.show_id;
 			lasttime = row.reserve_live_date;
 		}
@@ -296,7 +264,6 @@ app.get('/show', function(request, response){
 			var sql = 'SELECT * FROM ShowInfo WHERE show_id = ' + currshow +';';
 			var q = conn.query(sql);
 			q.on('row', function(row){
-				console.log(row);
 				
 				var title = row.title;
 				var director = row.director;
@@ -304,7 +271,6 @@ app.get('/show', function(request, response){
 				var show_info = row.show_info;
 				//var showinfo = {title : row.title, director : row.directors, music_director : row.musical_director, show_info : row.show_info};
 				showinfo = row;
-				console.log(showinfo);
 				
 				
 			});
@@ -312,13 +278,11 @@ app.get('/show', function(request, response){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
 				var counter = 1;
 				q1.on('row', function(row){
-					console.log(row);
 					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
 					counter = counter + 1;
 					//all info in p_info will be separately by newline, and the first line will be the performance time and id
 					//var p_info = row.date_time;
 					performances.push(r);
-					console.log(r);
 					/*var q2 = conn.query('SELECT name from Attendees WHERE p_id = '+row.p_id+';');
 					q2.on('row',function(row){
 						console.log(row);
@@ -331,7 +295,6 @@ app.get('/show', function(request, response){
 
 				});
 				q1.on('end', function(){
-					console.log({info : showinfo, p : performances});
 					response.render('tickets2.html', {info : showinfo, p : performances});
 				});
 			});
@@ -344,17 +307,13 @@ app.get('/show', function(request, response){
 });
 
 app.get('/attendee/:date', function(request, response){
-	console.log("attendee called");
-	console.log(request.params.date);
 	var attendees = [];
 	var sql = 'SELECT name FROM Attendees as a, Performances as p WHERE p.p_id = a.p_id and p.date_time = $1 AND p.show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)';
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
-		console.log(row);
 		attendees.push(row);
 	});
 	q.on('end', function(){
-		console.log("finished attendees")
 		response.json(attendees);
 	});
 });
@@ -368,8 +327,6 @@ app.get('/rtickets', function(request, response){
 	var email = request.query.email;
 	var cur = new Date();
 
-	console.log(date.getTime());
-	console.log("called rtickets");
 	if(date.getTime() > cur.getTime() + 21600000) {
 		conn.query("SELECT show_id FROM ShowInfo ORDER BY show_id DESC LIMIT 1")
 		.on('row', function(row) {
@@ -377,10 +334,7 @@ app.get('/rtickets', function(request, response){
 			conn.query("SELECT page_live_date FROM ShowInfo WHERE show_id = $1", [id])
 			.on('row', function(row) {
 				var show = new Date(row.page_live_date);
-				console.log(cur);
-				console.log(show);
 				if(cur.getTime() > show.getTime()) { // show is live
-					console.log("in the if");
 
 					// find p_id and num tickets for performance
 					var sql = "SELECT p_id, tickets FROM Performances WHERE date_time = $1 AND show_id IN (SELECT show_id FROM ShowInfo ORDER BY show_ID DESC LIMIT 1)";
@@ -412,7 +366,6 @@ app.get('/rtickets', function(request, response){
 				}
 				else { // show is not live
 
-					console.log("1");
 
 					// check email is reserved
 					var numTix = 0;
@@ -422,9 +375,6 @@ app.get('/rtickets', function(request, response){
 						numTix = row.tickets_alloted;
 					})
 					.on('end', function(res) {
-						console.log("query ended");
-						console.log(res);
-						console.log(numTix);
 						if(numTix > 0) {
 
 							// count already reserved tickets for email
@@ -448,14 +398,11 @@ app.get('/rtickets', function(request, response){
 									.on('end', function(res) {
 
 										if(found) {
-											console.log("here");
 											// count total tickets already reserved for performance
 											var sql = "SELECT * FROM Attendees WHERE p_id = $1";
 											conn.query(sql ,[p_id])
 											.on('end', function(res) {
 												var count = res.rowCount;
-												console.log(count);
-												console.log(numRes);
 												var tix = Math.min(numRes-count, numTix-reserved)
 												if(tix > 0) {
 													response.send(tix.toString());
@@ -511,28 +458,22 @@ app.get('/csv_page',function(request,response){
 			var q = conn.query(sql);
 			q.on('row', function(row){
 				
-				console.log(row);
 				//var showinfo = {title : row.title, director : row.director, musical_director : row.mdirector, show_info : row.show_info,
 				//	page_live : row.page_live_date, res_live : row.reserve_live_date};
 				showinfo = row;
 
-				console.log("showinfo \n" + showinfo);
 				
 			});
 			q.on('end', function(){
 				var q1 = conn.query('SELECT * FROM Performances WHERE show_id = '+currshow+';');
 				var counter = 0;
 				q1.on('row', function(row){
-					console.log(row);
 					var r = {date_time : row.date_time, tickets : row.tickets, reserves : row.reserves, count : counter};
 					counter = counter + 1;
 					performances.push(r);
 				});
 				q1.on('end', function(){
-					console.log("at the end");
-					console.log({info : showinfo, p : performances});
 					response.render('csv_page.html', {info : showinfo, p : performances});
-					console.log("told to render");
 				});
 			});
 		}
@@ -556,32 +497,22 @@ app.get('/csv/:date', function(request, response){
 	var q = conn.query(sql, [request.params.date]);
 	q.on('row', function(row){
 		query_ans += row.name+'\n';
-		console.log(query_ans);
 	});
 	q.on('end', function(){
 		query_ans = query_ans.substring(0,query_ans.length);
-		console.log(query_ans);
 	
 
 		csv()
 		.from.string(query_ans)
 		.to.stream(fs.createWriteStream(__dirname+'/'+request.params.date+'.csv'))
-		/*.transform( function(row){
-			//row.unshift(row.pop());
-			//console.log(row);
-			return row;
-		})*/
 		.on('record', function(row,index){
-			console.log(JSON.stringify(row));
 		})
-		.on('close', function(count){
-			console.log('Number of Attendees: ' + count);
-			
+		.on('close', function(count){	
 		})
 		.on('end', function(){
-			setTimeout(function(){response.sendfile(__dirname+'/'+request.params.date+'.csv');console.log("its been one second");},2000);
-			
-			
+			setTimeout(function() {
+				response.sendfile(__dirname+'/'+request.params.date+'.csv');
+			},2000);	
 		})
 		.on('error', function(error){
 			console.log(error.message);
@@ -608,51 +539,33 @@ app.post('/new_show', function(request, response){
 	var csv_string = request.body.csv_string;
 	var live_date = new Date(page_live);
 	var res_date = new Date(reserve_live);
-	console.log(page_live);
-	console.log(reserve_live);
 	if(live_date.getTime() < res_date.getTime()){
 		response.send("ERROR: live date must be after reserve date");
 	}
 	else{
-		console.log(performance);
 		var curr_show = -1;
-		console.log("in new show");
 		q = conn.query('INSERT INTO ShowInfo VALUES (NULL, $1, $2, $3, $4, $5, $6);',[title,director,mdirector,showinfo,page_live,reserve_live]);
 		q.on('end', function(){
-			console.log("finished puttint in show info");
 			var sql = 'SELECT show_id FROM ShowInfo ORDER BY show_id DESC limit 1;'
 			q1 = conn.query(sql);
 			q1.on('row',function(row){
 				curr_show = row.show_id;
-				console.log(curr_show);
 			});
 			q1.on('end', function(){
 				var rs = csv_string.split(',');
-				console.log("in the end");
-				console.log(rs);
 				for(var j=0;j<rs.length - 1;j=j+3){
 					q3 = conn.query('INSERT INTO Reserves VALUES ($1, $2, $3, $4);',[curr_show,rs[j],rs[j+2],rs[j+1]]).on('error', console.error);
 				}
 				var ps = performance.split(',');
-				console.log(ps);
 				for(var i=0;i<ps.length;i=i+3){
-					//var p = ps[i];
-					//console.log(p + " " + i);
-					//var p_info = p.split(',');
 					q2 = conn.query('INSERT INTO Performances VALUES ($1, NULL, $2, $3, $4);', [curr_show, ps[i], ps[i+1], ps[i+2]]).on('error', console.error);
-					console.log(i);
 					if(i + 3 == ps.length){
-						setTimeout(function(){response.redirect('/show');console.log("its been one second");},1000);
-					}
-					q2.on('end',function(){
-						console.log(i + ' ' + ps.length);
-
-						/*if(i+2 == ps.length){
-							console.log("made it to the redirect");
-							//MAKE SURE THIS WORKS
+						setTimeout(function(){
 							response.redirect('/show');
-							
-						}*/
+						},1000);
+					}
+					q2.on('end',function(){;
+
 					});
 				}
 			});
@@ -661,25 +574,16 @@ app.post('/new_show', function(request, response){
 });
 
 function parseDate(str) {
-	console.log(str);
 	var d = new Date();
 	d.setMonth(parseInt(str.substring(0,2))-1);
 	d.setDate(parseInt(str.substring(2,4)));
 	d.setHours(parseInt(str.substring(4,6)));
 	d.setMinutes(str.substring(6,8));
-	console.log(d);
 	return d;
 }
 
 function parse_showtime(showtime) {
-	// 1993-03-17T08%3A30
-	// 0-4 1993
-	// 5 -
-	// 6-7 03
-	// 8 -
-	// 9-10 17
-	// 11-15 T21%3
-	// 16-18 A12
+
 	var d = new Date();
 	var year = d.getFullYear();
 	var month = showtime.slice(0,2);
@@ -687,13 +591,7 @@ function parse_showtime(showtime) {
 	var hour = showtime.slice(4,6);
 	var minutes = showtime.slice(6,8)
 	var am_pm = "AM";
-	/*
-	console.log("yr:  "+year);
-	console.log("mth: "+month);					
-	console.log("day: "+day);
-	console.log("hr:  "+hour);
-	console.log("min: "+minutes);
-	*/
+
 	months = [{ month:"January",number:"01"},{ month:"February",number:"02"},{ month:"March",number:"03"},{ month:"April",number:"04"},{ month:"May",number:"05"},{ month:"June",number:"06"},{ month:"July",number:"07"},{ month:"August",number:"08"},{ month:"September",number:"09"},{ month:"October",number:"10"},{ month:"November",number:"11"},{ month:"December",number:"12"}];
 	for (var i = 0; i < months.length; i += 1) {
 		if (months[i].number == month) {
